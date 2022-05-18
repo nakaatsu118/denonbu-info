@@ -26,7 +26,7 @@ const Home = ({data}: Props):JSX.Element => {
             <div className={styles.musicTitle}>{song.title}</div>
             <div className={styles.imageAndLinkContainer}>
               <div className={styles.imageContainer}>
-                <img className={styles.jacketImage} src={song.jacket_image.url} />
+                <img className={styles.jacketImage} src={song.jacket_image.url + '?w=200'} />
                 <div className={styles.areas}>
                   {song.all_flag ? <></>
                   :
