@@ -1,0 +1,202 @@
+.container {
+  padding: 0 2rem;
+  background-color: #000000;
+  color: #ffffff;
+  font-family: 'Zen Maru Gothic', sans-serif;
+
+  @media screen and (max-width: 600px) {
+    width: fit-content;
+    padding: 0 1.5rem;
+  }
+
+}
+
+.header {
+  height: fit-content;
+  background-color: #000000;
+  border-bottom: 1px solid #ffffff;
+  padding: 16px;
+
+  h1 {
+    font-family: 'Dela Gothic One', cursive;
+    font-weight: normal;
+    font-size: 2rem;
+    margin: 0;
+
+    @media screen and (max-width: 600px) {
+      font-size: 3rem;
+    }
+  }
+
+  h2 {
+    font-weight: normal;
+    font-size: 0.8rem;
+    margin: 0;
+  }
+}
+
+.main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.musicContainer {
+  width: 640px;
+  border: solid 1px;
+  padding: 16px;
+  margin: 8px;
+
+  @media screen and (max-width: 600px) {
+    width: 100%;
+  }
+
+  .releaseDate {
+    font-size: 0.8rem;
+    font-weight: 200;
+
+    @media screen and (max-width: 600px) {
+      font-size: 1rem;
+    }
+
+    span {
+      font-size: 0.9rem;
+      font-weight: 400;
+
+      @media screen and (max-width: 600px) {
+        font-size: 1.6rem;
+      }
+    }
+  }
+
+  .musicTitle {
+    font-size: 1.2rem;
+    color: #000000;
+    background-color: #ffffff;
+    font-weight: 600;
+  }
+
+  .imageAndLinkContainer {
+    display: flex;
+    flex-direction: row;
+    height: auto;
+  }
+
+  .imageContainer {
+    position: relative;
+  }
+
+  .jacketImage {
+    width: 200px;
+    height: auto;
+  }
+
+  .linksAndCharacterContainer {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .links {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 32px 8px 0 8px;
+    gap: 8px;
+
+    .button a {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      margin: 0 auto;
+      padding: 0.8em 1.8em;
+      width: 160px;
+      color: #333;
+      font-size: 18px;
+      font-weight: 700;
+      background-color: #ccc;
+      border-radius: 50vh;
+      transition: 0.3s;
+    }
+
+    .button a::after {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-top: 3px solid #333333;
+      border-right: 3px solid #333333;
+      transform: rotate(45deg);
+    }
+
+    .button a:hover::before {
+      top: 0;
+      left: 0;
+    }
+
+    .button a:hover {
+      text-decoration: none;
+      background-color: #a0c4d3;
+    }
+  }
+
+  .areas {
+    display: flex;
+    font-size: 0.7rem;
+    position: absolute;
+    bottom: 5px;
+    left: 0px;
+    background-color: #000000;
+
+    @media screen and (max-width: 600px) {
+      font-size: 1rem;
+    }
+
+    .area {
+      padding: 4px;
+    }
+  }
+
+  .characters {
+    display: flex;
+    font-size: 0.8rem;
+    margin-top: auto;
+
+    @media screen and (max-width: 600px) {
+      font-size: 1rem;
+    }
+
+    .character {
+      padding: 8px;
+    }
+  }
+}
+
+.footer {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  @media screen and (max-width: 600px) {
+    max-width: none;
+  }
+
+  .desc {
+    font-size: 0.8rem;
+  }
+  .policy {
+    font-size: 0.8rem;
+  }
+  .copyright {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 16px;
+
+    a {
+      text-decoration: underline;
+    }
+  }
+}

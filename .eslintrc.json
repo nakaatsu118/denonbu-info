@@ -1,0 +1,7 @@
+{
+  "extends": ["next", "next/core-web-vitals"],
+  "rules": {
+    // Static Exportだとnext/imageが使えないためオフ
+    "@next/next/no-img-element": "off"
+  }
+}
