@@ -1,6 +1,4 @@
-import type { GetServerSideProps, NextPage } from 'next'
-import Head from 'next/head'
-import Image from 'next/image'
+import type { GetStaticProps } from 'next'
 import { Song } from '~/types/song'
 import { client } from '~/utils/microCMSClient'
 import styles from '../styles/Home.module.scss'
@@ -96,7 +94,7 @@ const Home = ({data}: Props):JSX.Element => {
 
 export default Home
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getStaticProps: GetStaticProps = async () => {
   const data = await client.get({ endpoint: "music", queries: {limit: 100} });
 
   return {
