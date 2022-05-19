@@ -8,7 +8,6 @@
     width: fit-content;
     padding: 0 1.5rem;
   }
-
 }
 
 .header {
@@ -54,6 +53,7 @@
   .releaseDate {
     font-size: 0.8rem;
     font-weight: 200;
+    margin-bottom: 0.2rem;
 
     @media screen and (max-width: 600px) {
       font-size: 1rem;
@@ -74,12 +74,15 @@
     color: #000000;
     background-color: #ffffff;
     font-weight: 600;
+    margin-bottom: 0.5rem;
+    padding: 0.3rem 0.2rem 0.4rem;
   }
 
   .imageAndLinkContainer {
     display: flex;
     flex-direction: row;
     height: auto;
+    align-items: stretch;
   }
 
   .imageContainer {
@@ -89,6 +92,7 @@
   .jacketImage {
     width: 200px;
     height: auto;
+    vertical-align: top;
   }
 
   .linksAndCharacterContainer {
@@ -98,12 +102,13 @@
   }
 
   .links {
+    height: 100%;
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    padding: 32px 8px 0 8px;
-    gap: 8px;
+    padding: 0 8px;
+    gap: 28px;
 
     .button a {
       display: flex;
@@ -119,6 +124,10 @@
       background-color: #ccc;
       border-radius: 50vh;
       transition: 0.3s;
+
+      .buttonText {
+        padding-bottom: 0.2rem;
+      }
     }
 
     .button a::after {
@@ -145,7 +154,7 @@
     display: flex;
     font-size: 0.7rem;
     position: absolute;
-    bottom: 5px;
+    bottom: 0px;
     left: 0px;
     background-color: #000000;
 
@@ -168,7 +177,7 @@
     }
 
     .character {
-      padding: 8px;
+      padding: 8px 8px 9px;
     }
   }
 }
