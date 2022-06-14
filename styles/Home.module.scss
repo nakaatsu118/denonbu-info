@@ -53,7 +53,8 @@
   .releaseDate {
     font-size: 0.8rem;
     font-weight: 200;
-    margin-bottom: 0.2rem;
+    margin-bottom: 0.5rem;
+    line-height: 0.8rem;
 
     @media screen and (max-width: 600px) {
       font-size: 1rem;
@@ -137,6 +138,7 @@
       border-top: 3px solid #333333;
       border-right: 3px solid #333333;
       transform: rotate(45deg);
+      transition: 0.3s;
     }
 
     .button a:hover::before {
@@ -146,7 +148,14 @@
 
     .button a:hover {
       text-decoration: none;
-      background-color: #a0c4d3;
+      background-color: #333;
+      color: #ccc;
+      box-shadow: 0px 0px 0px 2px #ccc;
+    }
+
+    .button a:hover::after {
+      border-top: 3px solid #ccc;
+      border-right: 3px solid #ccc;
     }
   }
 
@@ -170,6 +179,7 @@
   .characters {
     display: flex;
     font-size: 0.8rem;
+    font-weight: normal;
     margin-top: auto;
 
     @media screen and (max-width: 600px) {
