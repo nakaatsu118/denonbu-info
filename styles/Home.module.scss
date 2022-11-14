@@ -1,16 +1,20 @@
-.container {
-  padding: 0 2rem;
+.page {
   background-image: linear-gradient(180deg, #5d6366 0, #415460 25%, #1f4459 50%, #003553 75%, #00264d 100%);
-  min-height: 100vh;
   background-attachment: fixed;
   background-size: cover;
   background-position: center;
+  min-height: 100vh;
   color: #ffffff;
   font-family: 'Zen Kaku Gothic New', sans-serif;
+  width: 100%;
+}
+
+.container {
+  padding: 0 2rem;
 
   @media screen and (max-width: 600px) {
     width: fit-content;
-    padding: 0 1.5rem;
+    padding: 0 0.8rem;
   }
 }
 
@@ -18,9 +22,16 @@
   height: 120px;
   display: flex;
   padding: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 
   .headerImage {
     height: 100%;
+  }
+
+  @media screen and (max-width: 600px) {
+    height: 100px;
   }
 }
 
@@ -79,12 +90,15 @@
   position: relative;
   align-items: center;
   width: calc((100% - 780px) / 2);
+  min-width: 300px;
   margin: 8px;
   background: #2c2c2c87;
   animation: fadeIn 1s ease 0.5s 1 normal backwards;
 
   @media screen and (max-width: 600px) {
-    width: 100%;
+    min-width: 140px;
+    width: 46%;
+    margin: 4px;
   }
 
   .releaseDate {
@@ -104,7 +118,7 @@
       font-weight: 600;
 
       @media screen and (max-width: 600px) {
-        font-size: 1.6rem;
+        font-size: 0.4rem;
       }
     }
   }
@@ -115,6 +129,10 @@
     padding-left: 0.8rem;
     padding-right: 0.8rem;
     min-height: 40px;
+
+    @media screen and (max-width: 600px) {
+      min-height: auto;
+    }
   }
 
   .imageAndLinkContainer {
@@ -131,6 +149,10 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
+    @media screen and (max-width: 600px) {
+      height: 100%;
+    }
   }
 
   .jacketImage {
@@ -139,6 +161,12 @@
     height: 240px;
     vertical-align: top;
     z-index: 10;
+
+    @media screen and (max-width: 600px) {
+      width: 100%;
+      height: auto;
+      min-height: auto;
+    }
   }
 
   .backImageContainer {
@@ -146,9 +174,15 @@
     height: 100%;
     width: 100%;
     overflow: hidden;
+
+    @media screen and (max-width: 600px) {
+      height: 100%;
+    }
   }
 
   .backImage {
+    height: 100%;
+    width: 100%;
     filter: blur(10px);
   }
 
@@ -164,8 +198,14 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    padding: 8px 0 12px 0;
-    gap: 28px;
+    padding: 12px;
+    gap: 16px;
+
+    @media screen and (max-width: 600px) {
+      flex-direction: column;
+      height: auto;
+      gap: 8px;
+    }
 
     .button a {
       display: flex;
@@ -175,10 +215,9 @@
       margin: 0 auto;
       padding: 0.8em 1.8em;
       width: 100px;
-      color: #333;
       font-size: 12px;
       font-weight: 500;
-      background-color: #ccc;
+      box-shadow: 0px 0px 0px 1px #fafafa;
       border-radius: 50vh;
       transition: 0.3s;
 
@@ -191,8 +230,8 @@
       content: '';
       width: 5px;
       height: 5px;
-      border-top: 2px solid #333333;
-      border-right: 2px solid #333333;
+      border-top: 2px solid #fafafa;
+      border-right: 2px solid #fafafa;
       transform: rotate(45deg);
       transition: 0.3s;
     }
@@ -204,14 +243,14 @@
 
     .button a:hover {
       text-decoration: none;
-      background-color: #333;
-      color: #ccc;
-      box-shadow: 0px 0px 0px 1px #ccc;
+      color: #333333;
+      background-color: #fafafa;
+      box-shadow: none;
     }
 
     .button a:hover::after {
-      border-top: 2px solid #ccc;
-      border-right: 2px solid #ccc;
+      border-top: 2px solid #333333;
+      border-right: 2px solid #333333;
     }
   }
 
@@ -236,11 +275,12 @@
     display: flex;
     font-size: 0.6rem;
     font-weight: normal;
-    padding-bottom: 12px;
+    padding: 0 12px 14px 12px;
     gap: 4px;
+    margin-top: auto;
 
     @media screen and (max-width: 600px) {
-      font-size: 1rem;
+      font-size: 0.4rem;
     }
 
     .character {
