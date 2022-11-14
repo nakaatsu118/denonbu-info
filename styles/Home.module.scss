@@ -3,18 +3,17 @@
   background-attachment: fixed;
   background-size: cover;
   background-position: center;
-  min-height: 100vh;
   color: #ffffff;
   font-family: 'Zen Kaku Gothic New', sans-serif;
-  width: 100%;
+  width: fit-content;
+  height: 100%;
 }
 
 .container {
   padding: 0 2rem;
 
   @media screen and (max-width: 600px) {
-    width: fit-content;
-    padding: 0 0.8rem;
+    padding: 0;
   }
 }
 
