@@ -5,8 +5,11 @@
   background-position: center;
   color: #ffffff;
   font-family: 'Zen Kaku Gothic New', sans-serif;
-  width: fit-content;
   height: 100%;
+
+  @media screen and (max-width: 600px) {
+    width: fit-content;
+  }
 }
 
 .container {
