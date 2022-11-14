@@ -17,7 +17,7 @@ class MyDocument extends Document<Props> {
           <link rel="shortcut icon" href="/favicon.ico" />
           <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
           <link rel="preconnect" href="https://fonts.googleapis.com" />
-          <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@300;400;500&display=swap" rel="stylesheet" />
+          <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Montserrat&family=Zen+Kaku+Gothic+New:wght@300;400;500&display=swap" rel="stylesheet" />
         </Head>
         <body>
           <Main />

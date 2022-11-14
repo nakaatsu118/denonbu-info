@@ -1,82 +1,138 @@
+.page {
+  background-image: linear-gradient(180deg, #5d6366 0, #415460 25%, #1f4459 50%, #003553 75%, #00264d 100%);
+  background-attachment: fixed;
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+  color: #ffffff;
+  font-family: 'Zen Kaku Gothic New', sans-serif;
+  width: 100%;
+}
+
 .container {
   padding: 0 2rem;
-  background-color: #000000;
-  color: #ffffff;
-  font-family: 'Zen Maru Gothic', sans-serif;
 
   @media screen and (max-width: 600px) {
     width: fit-content;
-    padding: 0 1.5rem;
+    padding: 0 0.8rem;
   }
 }
 
 .header {
-  height: fit-content;
-  background-color: #000000;
-  border-bottom: 1px solid #ffffff;
+  height: 120px;
+  display: flex;
   padding: 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
 
-  h1 {
-    font-family: 'Dela Gothic One', cursive;
-    font-weight: normal;
-    font-size: 2rem;
-    margin: 0;
-
-    @media screen and (max-width: 600px) {
-      font-size: 3rem;
-    }
+  .headerImage {
+    height: 100%;
   }
 
-  h2 {
-    font-weight: normal;
-    font-size: 0.8rem;
-    margin: 0;
+  @media screen and (max-width: 600px) {
+    height: 100px;
   }
 }
 
 .main {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: stretch;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.topContainer {
+  display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
+  padding-bottom: 60px;
+  animation-name: blurTop;
+	animation-duration: 1.2s;
+	animation-fill-mode: forwards;
+
+  @keyframes blurTop{
+    from {
+    filter: blur(10px);
+    transform: scale(1.02);
+    }
+
+    to {
+    filter: blur(0);
+    transform: scale(1);
+    }
+  }
+
+  h1 {
+    font-weight: 600;
+    font-size: 1.6rem;
+    letter-spacing: 0.12em;
+    margin: 0;
+
+    @media screen and (max-width: 600px) {
+      font-size: 1.4rem;
+    }
+  }
+
+  h2 {
+    font-weight: 100;
+    font-size: 0.65rem;
+    margin: 0;
+  }
 }
 
 .musicContainer {
-  width: 640px;
-  border: solid 1px;
-  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  align-items: center;
+  width: calc((100% - 780px) / 2);
+  min-width: 300px;
   margin: 8px;
+  background: #2c2c2c87;
+  animation: fadeIn 1s ease 0.5s 1 normal backwards;
 
   @media screen and (max-width: 600px) {
-    width: 100%;
+    min-width: 140px;
+    width: 46%;
+    margin: 4px;
   }
 
   .releaseDate {
-    font-size: 0.8rem;
-    font-weight: 200;
-    margin-bottom: 0.5rem;
-    line-height: 0.8rem;
+    width: 100%;
+    justify-content: left;
+    color: #888888;
+    font-family: 'Montserrat', sans-serif;
+    letter-spacing: 0.12em;
+    padding-left: 0.6rem;
 
     @media screen and (max-width: 600px) {
       font-size: 1rem;
     }
 
     span {
-      font-size: 0.9rem;
-      font-weight: 400;
+      font-size: 0.6rem;
+      font-weight: 600;
 
       @media screen and (max-width: 600px) {
-        font-size: 1.6rem;
+        font-size: 0.4rem;
       }
     }
   }
 
   .musicTitle {
-    font-size: 1.2rem;
-    color: #000000;
-    background-color: #ffffff;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-    padding: 0.3rem 0.2rem 0.4rem;
+    font-size: 0.7rem;
+    font-weight: 400;
+    padding-left: 0.8rem;
+    padding-right: 0.8rem;
+    min-height: 40px;
+
+    @media screen and (max-width: 600px) {
+      min-height: auto;
+    }
   }
 
   .imageAndLinkContainer {
@@ -87,13 +143,47 @@
   }
 
   .imageContainer {
+    width: 100%;
+    height: 240px;
     position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    @media screen and (max-width: 600px) {
+      height: 100%;
+    }
   }
 
   .jacketImage {
-    width: 200px;
-    height: auto;
+    min-height: 240px;
+    width: auto;
+    height: 240px;
     vertical-align: top;
+    z-index: 10;
+
+    @media screen and (max-width: 600px) {
+      width: 100%;
+      height: auto;
+      min-height: auto;
+    }
+  }
+
+  .backImageContainer {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+
+    @media screen and (max-width: 600px) {
+      height: 100%;
+    }
+  }
+
+  .backImage {
+    height: 100%;
+    width: 100%;
+    filter: blur(10px);
   }
 
   .linksAndCharacterContainer {
@@ -108,8 +198,14 @@
     flex-direction: row;
     justify-content: center;
     align-items: center;
-    padding: 0 8px;
-    gap: 28px;
+    padding: 12px;
+    gap: 16px;
+
+    @media screen and (max-width: 600px) {
+      flex-direction: column;
+      height: auto;
+      gap: 8px;
+    }
 
     .button a {
       display: flex;
@@ -118,11 +214,10 @@
       position: relative;
       margin: 0 auto;
       padding: 0.8em 1.8em;
-      width: 160px;
-      color: #333;
-      font-size: 18px;
-      font-weight: 700;
-      background-color: #ccc;
+      width: 100px;
+      font-size: 12px;
+      font-weight: 500;
+      box-shadow: 0px 0px 0px 1px #fafafa;
       border-radius: 50vh;
       transition: 0.3s;
 
@@ -135,8 +230,8 @@
       content: '';
       width: 5px;
       height: 5px;
-      border-top: 3px solid #333333;
-      border-right: 3px solid #333333;
+      border-top: 2px solid #fafafa;
+      border-right: 2px solid #fafafa;
       transform: rotate(45deg);
       transition: 0.3s;
     }
@@ -148,14 +243,14 @@
 
     .button a:hover {
       text-decoration: none;
-      background-color: #333;
-      color: #ccc;
-      box-shadow: 0px 0px 0px 2px #ccc;
+      color: #333333;
+      background-color: #fafafa;
+      box-shadow: none;
     }
 
     .button a:hover::after {
-      border-top: 3px solid #ccc;
-      border-right: 3px solid #ccc;
+      border-top: 2px solid #333333;
+      border-right: 2px solid #333333;
     }
   }
 
@@ -178,17 +273,31 @@
 
   .characters {
     display: flex;
-    font-size: 0.8rem;
+    font-size: 0.6rem;
     font-weight: normal;
+    padding: 0 12px 14px 12px;
+    gap: 4px;
     margin-top: auto;
 
     @media screen and (max-width: 600px) {
-      font-size: 1rem;
+      font-size: 0.4rem;
     }
 
     .character {
-      padding: 8px 8px 9px;
+      padding: 6px;
+      border-radius: 8px;
     }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -217,5 +326,23 @@
     a {
       text-decoration: underline;
     }
+  }
+}
+
+.blur{
+	animation-name: blurAnime;
+	animation-duration: 0.7s;
+	animation-fill-mode: forwards;
+}
+
+@keyframes blurAnime{
+  from {
+	filter: blur(10px);
+	transform: scale(1.02);
+  }
+
+  to {
+	filter: blur(0);
+	transform: scale(1);
   }
 }

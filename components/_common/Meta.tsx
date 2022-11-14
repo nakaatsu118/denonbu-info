@@ -11,10 +11,10 @@ const Meta = ({
   pageOgImage: string;
   noIndex?: boolean;
 }) => {
-  const defaultTitle = '電音部配信楽曲一覧サイト';
+  const defaultTitle = 'DENONBU MUSIC INFO';
   const title = pageTitle ? `${pageTitle} | ${defaultTitle}` : defaultTitle;
-  const description = '電音部の配信楽曲情報をまとめたサイトです。';
-  const siteName = '電音部配信楽曲一覧サイト';
+  const description = '電音部の楽曲情報、配信リンクをまとめています。';
+  const siteName = 'DENONBU MUSIC INFO';
   const domain = 'www.denonbu.info';
   const url = pageUrl ? `https://${domain}/${pageUrl}/` : `https://${domain}`;
   const ogImage = pageOgImage || `https://${domain}/common/og-image.png`;
@@ -30,7 +30,7 @@ const Meta = ({
       <meta property="og:site_name" content={siteName} />
       <meta property="og:image" content={ogImage} />
       <meta property="og:locale" content="ja_JP" />
-      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:card" content="summary" />
       <meta name="twitter:creator" content="@nakaatsu" />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
