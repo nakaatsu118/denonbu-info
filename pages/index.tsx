@@ -13,8 +13,8 @@ const Home = ({ data }: Props): JSX.Element => {
   return (
     <div className={styles.page}>
       <div className={styles.header}>
-        <a href='./' rel="noopener noreferrer">
-          <img className={`${styles.headerImage} ${styles.blur}`} src='image/logo_trans.png' />
+        <a href='./' rel="noopener noreferrer" aria-label='Top'>
+          <img className={`${styles.headerImage} ${styles.blur}`} src='image/logo_trans.png' alt='logo' width={128} height={88} />
         </a>
       </div>
       <div className={styles.container}>
@@ -27,9 +27,9 @@ const Home = ({ data }: Props): JSX.Element => {
           {data.map((song) => (
             <div className={styles.musicContainer} key={song.id}>
               <div className={styles.imageContainer}>
-                <img className={styles.jacketImage} src={song.jacket_image.url + '?w=320'} />
+                <img className={styles.jacketImage} src={song.jacket_image.url + '?w=240&fm=webp'} alt={song.title} loading='lazy' width={240} height={240} />
                 <div className={styles.backImageContainer}>
-                  <img className={styles.backImage} src={song.jacket_image.url + '?w=320'} />
+                  <img className={styles.backImage} src={song.jacket_image.url + '?w=240&fm=webp'} alt={song.title + '_背景'} loading='lazy' width={300} height={240} />
                 </div>
               </div>
               <div className={styles.releaseDate}>

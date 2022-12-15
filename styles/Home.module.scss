@@ -29,6 +29,7 @@
   z-index: 100;
 
   .headerImage {
+    width: auto;
     height: 100%;
   }
 
@@ -52,21 +53,6 @@
   align-items: center;
   justify-content: center;
   padding-bottom: 60px;
-  animation-name: blurTop;
-	animation-duration: 1.2s;
-	animation-fill-mode: forwards;
-
-  @keyframes blurTop{
-    from {
-    filter: blur(10px);
-    transform: scale(1.02);
-    }
-
-    to {
-    filter: blur(0);
-    transform: scale(1);
-    }
-  }
 
   h1 {
     font-weight: 600;
@@ -118,10 +104,6 @@
     span {
       font-size: 0.6rem;
       font-weight: 600;
-
-      @media screen and (max-width: 600px) {
-        font-size: 0.4rem;
-      }
     }
   }
 
@@ -153,7 +135,7 @@
     justify-content: center;
 
     @media screen and (max-width: 600px) {
-      height: 100%;
+      height: auto;
     }
   }
 
@@ -178,7 +160,7 @@
     overflow: hidden;
 
     @media screen and (max-width: 600px) {
-      height: 100%;
+      display: none;
     }
   }
 
@@ -280,10 +262,6 @@
     padding: 0 12px 14px 12px;
     gap: 4px;
     margin-top: auto;
-
-    @media screen and (max-width: 600px) {
-      font-size: 0.4rem;
-    }
 
     .character {
       padding: 6px;
