@@ -1,10 +1,10 @@
 import type { GetStaticProps } from 'next';
 import { Song } from '~/types/song';
 import { client } from '~/utils/microCMSClient';
-import styles from '../styles/Home.module.scss';
+import styles from './Home.module.scss';
 import { parseISO, format } from 'date-fns';
 import Meta from '~/components/_common/Meta';
-import Footer from '~/components/Footer';
+import { Pagination } from '~/components/Pagination';
 import Link from 'next/link';
 
 export interface Props {
@@ -15,6 +15,7 @@ export interface Props {
 const isLazy = (index: Number) => {
   return index >= 8 ? 'lazy' : 'eager';
 }
+const PER_PAGE = 12;
 
 const Home = ({ data, totalCount }: Props): JSX.Element => {
   return (
@@ -27,7 +28,8 @@ const Home = ({ data, totalCount }: Props): JSX.Element => {
       <div className={styles.container}>
         <Meta pageTitle="" pageUrl="" pageOgImage="" />
         <div className={styles.topContainer} >
-          <h1>NEW MUSIC</h1>
+          <h1>ALL MUSIC</h1>
+          <h2>電音部の楽曲情報、配信リンクをまとめています</h2>
         </div>
         <div className={styles.main}>
           {data.map((song, index) => (
@@ -80,10 +82,7 @@ const Home = ({ data, totalCount }: Props): JSX.Element => {
             </div>
           ))}
         </div>
-        <div className={styles.musicButton}>
-          <Link href='/music/1' passHref><p>全楽曲一覧</p></Link>
-        </div>
-        <Footer />
+        <Pagination totalCount={totalCount} />
       </div>
     </div>
   );
@@ -91,8 +90,18 @@ const Home = ({ data, totalCount }: Props): JSX.Element => {
 
 export default Home;
 
-export const getStaticProps: GetStaticProps = async () => {
-  const data = await client.get({ endpoint: 'music', queries: { offset: 0, limit: 4 } });
+export const getStaticPaths = async () => {
+  const repos = await client.get({ endpoint: 'music' });
+  const range = (start: number, end: number) =>
+  [...Array(end - start + 1)].map((_, i) => start + i);
+  const paths = range(1, Math.ceil(repos.totalCount / PER_PAGE)).map((repo) => `/music/${repo}`);
+
+  return { paths, fallback: false };
+}
+
+export const getStaticProps: GetStaticProps = async (context) => {
+  const id = context.params ? context.params.id : '';
+  const data = await client.get({ endpoint: 'music', queries: { offset: (Number(id) - 1) * PER_PAGE, limit: PER_PAGE } });
 
   return {
     props: {
