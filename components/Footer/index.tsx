@@ -6,8 +6,7 @@ const Footer = (): JSX.Element => {
       <div className={styles.desc}>
         <h3>このサイトについて</h3>
         <p>
-          電音部の楽曲情報（YouTube, Twitter
-          etc…）が混在していて配信サイト一覧などが追いづらい状態だったので、一覧で見やすいサイトが欲しくなったので作成しました。
+          電音部の楽曲情報をまとめて見やすいサイトが欲しくなったので作成しました。
         </p>
         <h3>TODO</h3>
         <ul>
@@ -20,7 +19,6 @@ const Footer = (): JSX.Element => {
           <li>バンダイナムコエンターテインメント様とは一切関係ありません。</li>
           <li>当サイトで使用している画像の著作権は各権利者に帰属いたします。</li>
           <li>ご意見ご要望ございましたら下記Twitterアカウントまでご連絡ください。</li>
-
           <li>
             このコンテンツはファンメイドコンテンツです。ファンメイドコンテンツポリシー（
             <a href="https://denonbu.jp/guidelines">https://denonbu.jp/guidelines</a>）のもと制作されています。

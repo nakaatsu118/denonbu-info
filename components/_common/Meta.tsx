@@ -11,10 +11,10 @@ const Meta = ({
   pageOgImage: string;
   noIndex?: boolean;
 }) => {
-  const defaultTitle = 'DENONBU MUSIC INFO';
+  const defaultTitle = 'DENONBU MUSIC INFO - 電音部楽曲情報';
   const title = pageTitle ? `${pageTitle} | ${defaultTitle}` : defaultTitle;
-  const description = '電音部の楽曲情報、配信リンクをまとめています。';
-  const siteName = 'DENONBU MUSIC INFO';
+  const description = '電音部プロジェクトの楽曲情報、YouTube動画や配信サイトのリンクをまとめています。';
+  const siteName = 'DENONBU MUSIC INFO - 電音部楽曲情報';
   const domain = 'www.denonbu.info';
   const url = pageUrl ? `https://${domain}/${pageUrl}/` : `https://${domain}`;
   const ogImage = pageOgImage || `https://${domain}/common/og-image.png`;
@@ -38,7 +38,7 @@ const Meta = ({
       <meta name="twitter:image" content={ogImage} />
       <meta name="viewport" content="width=device-width" />
       <meta name="format-detection" content="telephone=no" />
-      <meta name="theme-color" content="#000000" />
+      <meta name="theme-color" content="#5d6366" />
       {/* noIndex === true の場合のみ noindex 有効化 */}
       {noIndex && <meta name="robots" content="noindex" />}
       <link rel="shortcut icon" href="/favicon.ico" />
