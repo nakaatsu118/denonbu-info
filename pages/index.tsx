@@ -12,7 +12,7 @@ export interface Props {
   totalCount: number;
 }
 
-const isLazy = (index: Number) => {
+const isLazy = (index: number) => {
   return index >= 8 ? 'lazy' : 'eager';
 }
 

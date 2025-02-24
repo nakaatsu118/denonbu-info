@@ -6,13 +6,14 @@ import { parseISO, format } from 'date-fns';
 import Meta from '~/components/_common/Meta';
 import { Pagination } from '~/components/Pagination';
 import Link from 'next/link';
+import Footer from '~/components/Footer';
 
 export interface Props {
   data: Song[];
   totalCount: number;
 }
 
-const isLazy = (index: Number) => {
+const isLazy = (index: number) => {
   return index >= 8 ? 'lazy' : 'eager';
 }
 const PER_PAGE = 12;
@@ -83,6 +84,7 @@ const Home = ({ data, totalCount }: Props): JSX.Element => {
           ))}
         </div>
         <Pagination totalCount={totalCount} />
+        <Footer />
       </div>
     </div>
   );
