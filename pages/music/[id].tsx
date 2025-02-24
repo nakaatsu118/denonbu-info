@@ -6,6 +6,7 @@ import { parseISO, format } from 'date-fns';
 import Meta from '~/components/_common/Meta';
 import { Pagination } from '~/components/Pagination';
 import Link from 'next/link';
+import Footer from '~/components/Footer';
 
 export interface Props {
   data: Song[];
@@ -83,6 +84,7 @@ const Home = ({ data, totalCount }: Props): JSX.Element => {
           ))}
         </div>
         <Pagination totalCount={totalCount} />
+        <Footer />
       </div>
     </div>
   );
