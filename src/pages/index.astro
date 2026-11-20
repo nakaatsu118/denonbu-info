@@ -1,0 +1,18 @@
+---
+import Layout from '../layouts/Layout.astro';
+import SongList from '../components/SongList.astro';
+import styles from '../styles/Home.module.scss';
+import { getAllSongs } from '../lib/microcms';
+
+const songs = (await getAllSongs()).slice(0, 4);
+---
+
+<Layout>
+  <div class={styles.topContainer}>
+    <h1>NEW MUSIC</h1>
+  </div>
+  <SongList songs={songs} />
+  <div class={styles.musicButton}>
+    <a href="/music/1"><p>全楽曲一覧</p></a>
+  </div>
+</Layout>

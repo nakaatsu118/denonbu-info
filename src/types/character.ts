@@ -1,4 +1,4 @@
-import { Area } from "./area";
+import type { Area } from "./area";
 
 export interface Root {
   contents: Character[]

@@ -1,0 +1,85 @@
+---
+import '../styles/globals.scss';
+import styles from '../styles/Home.module.scss';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  noIndex?: boolean;
+}
+const { noIndex = false } = Astro.props;
+const title = 'DENONBU MUSIC INFO - 電音部楽曲情報';
+const description = '電音部プロジェクトの楽曲情報、YouTube動画や配信サイトのリンクをまとめています。';
+const url = 'https://www.denonbu.info';
+const ogImage = `${url}/common/og-image.png`;
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={url} />
+    <meta property="og:description" content={description} />
+    <meta property="og:site_name" content={title} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:locale" content="ja_JP" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:creator" content="@nakaatsu" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:url" content={url} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="theme-color" content="#5d6366" />
+    {noIndex && <meta name="robots" content="noindex" />}
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Montserrat&family=Zen+Kaku+Gothic+New:wght@300;400;500&display=swap"
+      rel="stylesheet"
+    />
+    <script is:inline>
+      (function (w, d, s, l, i) {
+        w[l] = w[l] || [];
+        w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+        var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s);
+        j.async = true;
+        j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i;
+        f.parentNode.insertBefore(j, f);
+      })(window, document, 'script', 'dataLayer', 'GTM-KQR57SR');
+    </script>
+  </head>
+  <body>
+    <noscript>
+      <iframe
+        src="https://www.googletagmanager.com/ns.html?id=GTM-KQR57SR"
+        height="0"
+        width="0"
+        style="display:none;visibility:hidden"
+        title="Google Tag Manager"></iframe>
+    </noscript>
+    <div class={styles.page}>
+      <div class={styles.header}>
+        <a href="/">
+          <img
+            class={`${styles.headerImage} ${styles.blur}`}
+            src="/image/logo_trans.png"
+            alt="logo"
+            width="128"
+            height="88"
+          />
+        </a>
+      </div>
+      <div class={styles.container}>
+        <slot />
+        <Footer />
+      </div>
+    </div>
+  </body>
+</html>

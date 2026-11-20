@@ -1,5 +1,5 @@
-import { Character } from "./character";
-import { Area } from "./area";
+import type { Character } from "./character";
+import type { Area } from "./area";
 
 export interface Root {
   contents: Song[]
