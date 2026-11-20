@@ -36,3 +36,8 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# astro / cloudflare
+/dist/
+/.astro/
+/.wrangler/

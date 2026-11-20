@@ -1,0 +1,41 @@
+---
+import type { GetStaticPaths } from 'astro';
+import Layout from '../../layouts/Layout.astro';
+import SongList from '../../components/SongList.astro';
+import styles from '../../styles/Home.module.scss';
+import pagination from '../../styles/Pagination.module.scss';
+import { getAllSongs } from '../../lib/microcms';
+
+export const getStaticPaths = (async () => {
+  const PER_PAGE = 12;
+  const songs = await getAllSongs();
+  const lastPage = Math.ceil(songs.length / PER_PAGE);
+  return Array.from({ length: lastPage }, (_, i) => ({
+    params: { id: String(i + 1) },
+    props: { songs: songs.slice(i * PER_PAGE, (i + 1) * PER_PAGE), current: i + 1, lastPage },
+  }));
+}) satisfies GetStaticPaths;
+
+const { songs, current, lastPage } = Astro.props;
+---
+
+<Layout>
+  <div class={styles.topContainer}>
+    <h1>ALL MUSIC</h1>
+    <h2>電音部の楽曲情報、配信リンクをまとめています</h2>
+  </div>
+  <SongList songs={songs} />
+  <ul class={pagination.pagination}>
+    {
+      Array.from({ length: lastPage }, (_, i) => i + 1).map((number) => (
+        <a
+          href={`/music/${number}`}
+          class={number === current ? pagination.activeButton : pagination.linkButton}
+          aria-current={number === current ? 'page' : undefined}
+        >
+          <li>{number}</li>
+        </a>
+      ))
+    }
+  </ul>
+</Layout>

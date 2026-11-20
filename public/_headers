@@ -1,0 +1,3 @@
+# 検証用のworkers.devは検索エンジンに登録させない。
+https://denonbu-info.nakaatsu-world.workers.dev/*
+  X-Robots-Tag: noindex

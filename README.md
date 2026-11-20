@@ -1,36 +1,43 @@
 # 電音部配信楽曲一覧ページ
 
-## Usage
+電音部の楽曲情報をまとめた非公式ファンサイトです。AstroでmicroCMSの楽曲データを静的生成し、Cloudflare Workers Static Assetsで配信します。
+
+## セットアップ
+
+Node.js 24.21.0を使用します（`.tool-versions`参照）。
 
 ```sh
-# setup
-yarn install
-
-# run local
-yarn dev
-
-# build static page
-# /out
-yarn build
+npm ci
+cp .env.sample .env
+npm run dev
 ```
 
-## What Changed
+`.env`に`microCMSServiceDomain`と`microCMSApiKey`を設定します。キーはビルド時だけ使用し、`PUBLIC_`を付けません。
 
-- cssはsassを前提とする
-- `component/_common/Meta.tsx` にて各ページのmeta情報共通化
-- `_app.tsx` にGTM設定を追加
-- `_document.tsx` を作成
+## 検証・ビルド
 
-### Directory
+```sh
+# Astroの型チェック
+npm run check
 
-- `components` : コンポーネントファイルを格納。汎用的なものは`_common`に格納。
-- `types` : 型定義ファイルを格納。
-- `utils` : 汎用的に使われるfunctionを格納。
+# dist/に静的サイトを生成（microCMSへの接続が必要）
+npm run build
 
-## Other Rules
+# Wranglerのローカル環境でdist/を配信
+npm start
+```
 
-各コンポーネントの構成を以下にする。
-- /components
-  - Hoge
-    - index.tsx
-    - Hoge.module.scss
+ビルドは楽曲を全件取得し、取得件数が`totalCount`と合わなければ失敗します。URLは旧サイトと同じ`/`と`/music/1`〜`/music/N`です。末尾にスラッシュを付けたURLは付けないURLへ転送し、存在しないURLには`404.html`を返します。
+
+## デプロイ
+
+`wrangler.jsonc`のWorker名は`denonbu-info`です。Workers Buildsにリポジトリを接続し、ビルド環境にCMSの2変数を登録します。ビルドコマンドは`npm run build`、デプロイコマンドは`npm run deploy`です。microCMSの記事を更新したときは、ビルドとデプロイを再実行してください。
+
+## ディレクトリ
+
+- `src/pages` : ページ。`music/[id].astro`で一覧のページ送りを生成します。
+- `src/layouts` : meta情報、GTM、ヘッダー、フッターを含む共通レイアウト。
+- `src/components` : コンポーネント。
+- `src/lib` : microCMSからの取得と日付の整形。
+- `src/styles` : SCSSのスタイル。コンポーネント用はCSS Modules（`*.module.scss`）にします。
+- `src/types` : 型定義。

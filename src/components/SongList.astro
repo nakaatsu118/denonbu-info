@@ -1,0 +1,73 @@
+---
+import styles from '../styles/Home.module.scss';
+import { formatDate } from '../lib/microcms';
+import type { Song } from '../types/song';
+
+interface Props {
+  songs: Song[];
+}
+const { songs } = Astro.props;
+const isLazy = (index: number) => (index >= 8 ? 'lazy' : 'eager');
+---
+
+<div class={styles.main}>
+  {
+    songs.map((song, index) => (
+      <div class={styles.musicContainer}>
+        <div class={styles.imageContainer}>
+          <img
+            class={styles.jacketImage}
+            src={song.jacket_image.url + '?w=240&fm=webp'}
+            alt={song.title}
+            width="240"
+            height="240"
+            loading={isLazy(index)}
+          />
+          <div class={styles.backImageContainer}>
+            <img
+              class={styles.backImage}
+              src={song.jacket_image.url + '?w=240&fm=webp'}
+              alt={song.title + '_背景'}
+              width="300"
+              height="240"
+              loading={isLazy(index)}
+            />
+          </div>
+        </div>
+        <div class={styles.releaseDate}>
+          <span>{formatDate(song.release_date)}</span>
+        </div>
+        <div class={styles.musicTitle}>{song.title}</div>
+        <div class={styles.links}>
+          {song.youtube && (
+            <div class={styles.button}>
+              <a class={styles.link} href={song.youtube} target="_blank" rel="noopener noreferrer">
+                <span class={styles.buttonText}>YouTube</span>
+              </a>
+            </div>
+          )}
+          {song.streaming_link && (
+            <div class={styles.button}>
+              <a class={styles.link} href={song.streaming_link} target="_blank" rel="noopener noreferrer">
+                <span class={styles.buttonText}>配信Link</span>
+              </a>
+            </div>
+          )}
+        </div>
+        <div class={styles.characters}>
+          {song.all_flag ? (
+            <div class={styles.character} style={{ backgroundColor: 'red' }}>
+              電音部
+            </div>
+          ) : (
+            song.characters.map((character) => (
+              <div class={styles.character} style={{ backgroundColor: character.color }}>
+                {character.name}
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    ))
+  }
+</div>
