@@ -24,6 +24,29 @@
     }
   }
 
+  // iOSのSafari 26は、固定要素とsticky要素をステータスバーとツールバーの裏に描かない。
+  // iOSでは壁を文書の先頭に置き、スクリプトがスクロールに合わせて動かす。
+  // .clip はページ全体を覆って、動かした壁がページを下へ伸ばさないよう切り取る。
+  @supports (-webkit-touch-callout: none) {
+    :global(body) {
+      position: relative;
+    }
+
+    .clip {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      overflow: clip;
+      pointer-events: none;
+    }
+
+    .wall {
+      position: absolute;
+      inset: -160px 0 auto;
+      height: calc(100lvh + 320px);
+    }
+  }
+
   // 壁そのものをぼかす。backdrop-filter は、立体に置いたタイルをぼかさない環境があった。
   // ponytail: 画面全体を毎フレームぼかし直す。重い端末が出てきたら、壁を縮小して描くか流れを止める。
   .stage {
