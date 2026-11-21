@@ -6,7 +6,9 @@
 :global(.js) {
   .wall {
     position: fixed;
-    inset: 0;
+    // iOSのSafariでは inset: 0 の固定要素がステータスバーとツールバーの裏まで届かず、
+    // そこだけ黒くなる。上下に大きくはみ出させて、バーの裏まで壁を描く。
+    inset: -160px 0;
     z-index: 0;
     display: block;
     overflow: hidden;
