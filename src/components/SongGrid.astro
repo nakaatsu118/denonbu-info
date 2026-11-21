@@ -1,0 +1,208 @@
+---
+import shell from '../styles/Home.module.scss';
+import songStyles from '../styles/Song.module.scss';
+import styles from '../styles/List.module.scss';
+import SongDialog from './SongDialog.astro';
+import SongInfo from './SongInfo.astro';
+import { ALL, formatDate, image, searchKey } from '../lib/microcms';
+import type { Song } from '../types/song';
+
+interface Props {
+  songs: Song[];
+}
+const { songs } = Astro.props;
+
+const NEW_COUNT = 4;
+const EAGER_COUNT = 12;
+const OTHER = 'other'; // エリアに属さないキャラクターをまとめる選択肢の値
+
+const areas = new Map(songs.flatMap((song) => song.area.map((area) => [area.id, area.name] as const)));
+const characters = [
+  ...new Map(songs.flatMap((song) => song.characters.map((character) => [character.id, character] as const))).values(),
+];
+const others = characters.filter((character) => !character.area || !areas.has(character.area.id));
+const otherIds = new Set(others.map((character) => character.id));
+
+const areaKeys = (song: Song) =>
+  song.all_flag
+    ? [ALL]
+    : [...song.area.map((area) => area.id), ...(song.characters.some((c) => otherIds.has(c.id)) ? [OTHER] : [])];
+
+const groups = [
+  ...[...areas].map(([id, name]) => ({ id, name, members: characters.filter((c) => c.area?.id === id) })),
+  ...(others.length > 0 ? [{ id: OTHER, name: 'その他', members: others }] : []),
+  { id: ALL, name: '電音部（全員）', members: [] },
+].map((group) => ({ ...group, count: songs.filter((song) => areaKeys(song).includes(group.id)).length }));
+const songCount = (characterId: string) => songs.filter((song) => song.characters.some((c) => c.id === characterId)).length;
+
+// 新しい順に並んだ曲を、年ごとにまとめる。
+const years = [...Map.groupBy(songs, (song) => formatDate(song.release_date).slice(0, 4))];
+const newest = new Set(songs.slice(0, NEW_COUNT));
+const eager = new Set(songs.slice(0, EAGER_COUNT));
+---
+
+<form class={styles.page} data-filters>
+  <h1 class={shell.srOnly}>DENONBU MUSIC INFO - 電音部楽曲情報</h1>
+
+  <div class={styles.side} role="search">
+    <input type="search" name="q" placeholder="曲名・キャラクター" aria-label="検索" autocomplete="off" />
+    <h2 id="area-title">エリア</h2>
+    <div class={styles.opts} role="radiogroup" aria-labelledby="area-title">
+      <label class={styles.opt}>
+        <input type="radio" name="area" value="" checked />
+        すべて
+        <span>{songs.length}</span>
+      </label>
+      {
+        groups.map((group) => (
+          <>
+            <label class={styles.opt}>
+              <input type="radio" name="area" value={group.id} />
+              {group.name}
+              <span>{group.count}</span>
+            </label>
+            {group.members.length > 0 && (
+              <div class={styles.members}>
+                {group.members.map((character) => (
+                  <label class={styles.opt}>
+                    <input type="radio" name="char" value={character.id} />
+                    <i style={{ backgroundColor: character.color }} />
+                    {character.name}
+                    <span>{songCount(character.id)}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </>
+        ))
+      }
+    </div>
+  </div>
+
+  <main class={styles.body}>
+    <div class={styles.tools}>
+      <output data-count>{songs.length}曲</output>
+      <select name="sort" aria-label="並び替え">
+        <option value="desc">新しい順</option>
+        <option value="asc">古い順</option>
+      </select>
+    </div>
+    <div data-years>
+      {
+        years.map(([year, list]) => (
+          <section class={styles.year} data-year>
+            <h2>
+              {year}
+              <span data-year-count>{list.length}曲</span>
+            </h2>
+            <div class={styles.grid}>
+              {list.map((song) => (
+                <article
+                  class={styles.tile}
+                  data-tile
+                  data-q={searchKey(song)}
+                  data-areas={areaKeys(song).join(' ')}
+                  data-chars={song.characters.map((c) => c.id).join(' ')}
+                >
+                  <button class={styles.face} type="button" data-face aria-label={`${song.title} の詳細を開く`}>
+                    <img
+                      src={image(song.jacket_image.url, 240)}
+                      srcset={[240, 480].map((w) => `${image(song.jacket_image.url, w)} ${w}w`).join(', ')}
+                      sizes="(max-width: 720px) 30vw, 190px"
+                      data-large={image(song.jacket_image.url, 960)}
+                      alt={song.title}
+                      width="240"
+                      height="240"
+                      loading={eager.has(song) ? 'eager' : 'lazy'}
+                      decoding="async"
+                    />
+                    {newest.has(song) && <span class={songStyles.new}>NEW</span>}
+                  </button>
+                  <div class={styles.meta}>
+                    <p class={songStyles.date}>{formatDate(song.release_date).slice(5)}</p>
+                    <h3>{song.title}</h3>
+                    <p class={styles.who}>
+                      {song.all_flag ? (
+                        <i style={{ backgroundColor: 'red' }} />
+                      ) : (
+                        song.characters.map((character) => <i style={{ backgroundColor: character.color }} />)
+                      )}
+                      <span>{song.all_flag ? '電音部' : song.characters.map((c) => c.name).join('・')}</span>
+                    </p>
+                  </div>
+                  <SongInfo song={song} />
+                </article>
+              ))}
+            </div>
+          </section>
+        ))
+      }
+    </div>
+    <p class={styles.empty} data-empty hidden>該当する曲がありません</p>
+  </main>
+</form>
+
+<SongDialog />
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-filters]')!;
+  const years = form.querySelector<HTMLElement>('[data-years]')!;
+  const sections = [...years.querySelectorAll<HTMLElement>('[data-year]')];
+  const count = form.querySelector<HTMLElement>('[data-count]')!;
+  const empty = form.querySelector<HTMLElement>('[data-empty]')!;
+  const checkedChars = () => form.querySelectorAll<HTMLInputElement>('[name="char"]:checked');
+
+  let asc = false;
+  let lastChar = '';
+
+  const apply = () => {
+    const data = new FormData(form);
+    const words = String(data.get('q')).normalize('NFKC').toLowerCase().split(/\s+/).filter(Boolean);
+    const area = String(data.get('area') ?? '');
+    const char = String(data.get('char') ?? '');
+    lastChar = char;
+
+    let total = 0;
+    for (const section of sections) {
+      let shown = 0;
+      for (const el of section.querySelectorAll<HTMLElement>('[data-tile]')) {
+        // キャラクターを選んでいるときは、エリアをまたいでその人の曲をすべて出す。
+        const keys = char ? el.dataset.chars! : el.dataset.areas!;
+        const key = char || area;
+        el.hidden = !(words.every((word) => el.dataset.q!.includes(word)) && (!key || keys.split(' ').includes(key)));
+        if (!el.hidden) shown++;
+      }
+      section.hidden = shown === 0;
+      section.querySelector('[data-year-count]')!.textContent = `${shown}曲`;
+      total += shown;
+    }
+    count.textContent = `${total}曲`;
+    empty.hidden = total > 0;
+
+    // 並びは最初から新しい順なので、向きが変わったときだけ年と曲をそれぞれ逆順に入れ直す。
+    if ((data.get('sort') === 'asc') !== asc) {
+      asc = !asc;
+      years.append(...[...years.children].reverse());
+      for (const section of sections) {
+        const grid = section.lastElementChild!;
+        grid.append(...[...grid.children].reverse());
+      }
+    }
+  };
+
+  form.addEventListener('input', (e) => {
+    // エリアを切り替えたら、前のエリアで選んでいたキャラクターは外す。
+    if ((e.target as HTMLInputElement).name === 'area') for (const el of checkedChars()) el.checked = false;
+    apply();
+  });
+  // 選択中のキャラクターをもう一度押すと、選択を外してエリア全体に戻す。
+  form.addEventListener('click', (e) => {
+    const el = e.target as HTMLInputElement;
+    if (el.name !== 'char' || el.value !== lastChar) return;
+    el.checked = false;
+    apply();
+  });
+  form.addEventListener('submit', (e) => e.preventDefault());
+
+  apply(); // 再読み込みでフォームの値が復元されていても、表示を合わせる
+</script>

@@ -1,0 +1,62 @@
+// 一覧の背景に流す、ジャケットの壁。飾りなので操作は受け付けない。
+.wall {
+  display: none; // スクリプトが位置を決めるので、動かない環境では出さない
+}
+
+:global(.js) {
+  .wall {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    display: block;
+    overflow: hidden;
+    pointer-events: none;
+
+    // すりガラス：ぼかした壁（.stage）を暗くして、上に載る一覧の文字が読めるようにする。
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgb(10 10 11 / 0.72);
+    }
+  }
+
+  // 壁そのものをぼかす。backdrop-filter は、立体に置いたタイルをぼかさない環境があった。
+  // ponytail: 画面全体を毎フレームぼかし直す。重い端末が出てきたら、壁を縮小して描くか流れを止める。
+  .stage {
+    position: absolute;
+    inset: -48px; // ぼかしで縁が暗く欠けないように、画面より少し大きく描く
+    filter: blur(32px) saturate(1.4);
+  }
+
+  .tile {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: none; // 位置が決まったタイルだけスクリプトが表示する
+    width: var(--size);
+    height: var(--size);
+    margin: calc(var(--size) / -2) 0 0 calc(var(--size) / -2);
+    will-change: transform;
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 6px;
+      background: #161618;
+      object-fit: cover;
+    }
+  }
+
+  .stage[data-intro] img {
+    animation: burst 0.9s var(--ease-out) var(--delay, 0ms) backwards;
+  }
+}
+
+@keyframes burst {
+  from {
+    opacity: 0;
+    transform: translate(var(--bx, 0), var(--by, 0)) scale(0.3);
+  }
+}

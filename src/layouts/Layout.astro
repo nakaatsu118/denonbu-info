@@ -32,17 +32,21 @@ const ogImage = `${url}/common/og-image.png`;
     <meta name="twitter:description" content={description} />
     <meta name="twitter:url" content={url} />
     <meta name="twitter:image" content={ogImage} />
-    <meta name="viewport" content="width=device-width" />
+    <meta name="viewport" content="width=device-width, viewport-fit=cover" />
     <meta name="format-detection" content="telephone=no" />
-    <meta name="theme-color" content="#5d6366" />
+    <meta name="theme-color" content="#0a0a0b" />
     {noIndex && <meta name="robots" content="noindex" />}
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Montserrat&family=Zen+Kaku+Gothic+New:wght@300;400;500&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap"
       rel="stylesheet"
     />
+    <script is:inline>
+      // スクリプトが動く環境だけ「壁」の見た目に切り替える。描画前に付けて、一覧表示が一瞬見えるのを防ぐ。
+      document.documentElement.classList.add('js');
+    </script>
     <script is:inline>
       (function (w, d, s, l, i) {
         w[l] = w[l] || [];
@@ -64,22 +68,27 @@ const ogImage = `${url}/common/og-image.png`;
         style="display:none;visibility:hidden"
         title="Google Tag Manager"></iframe>
     </noscript>
-    <div class={styles.page}>
-      <div class={styles.header}>
-        <a href="/">
-          <img
-            class={`${styles.headerImage} ${styles.blur}`}
-            src="/image/logo_trans.png"
-            alt="logo"
-            width="128"
-            height="88"
-          />
-        </a>
-      </div>
-      <div class={styles.container}>
-        <slot />
+    <header class={styles.header}>
+      <a class={styles.logo} href="/">
+        <img src="/image/logo_trans.png" alt="DENONBU MUSIC INFO" width="130" height="92" />
+      </a>
+      <button class={styles.pill} type="button" data-open="#about">ABOUT</button>
+    </header>
+    <slot />
+    <dialog id="about" class={styles.dialog} aria-labelledby="about-title">
+      <div class={styles.panel}>
         <Footer />
       </div>
-    </div>
+      <button class={styles.close} type="button" data-close aria-label="閉じる">×</button>
+    </dialog>
+    <script>
+      // data-open で指定したダイアログを開く。×か、中身の外側を押すと閉じる。
+      document.addEventListener('click', (e) => {
+        const target = e.target as Element;
+        const opener = target.closest<HTMLElement>('[data-open]');
+        if (opener) document.querySelector<HTMLDialogElement>(opener.dataset.open!)?.showModal();
+        else if (target.matches('dialog') || target.closest('[data-close]')) target.closest('dialog')?.close();
+      });
+    </script>
   </body>
 </html>

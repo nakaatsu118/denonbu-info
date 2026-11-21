@@ -1,0 +1,159 @@
+// 曲の情報（日付、曲名、キャラクター、リンク）と、それを全面に開く詳細の見た目。
+.new {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--fg);
+  color: #000;
+  font: 600 10px/1.5 'Montserrat', sans-serif;
+  letter-spacing: 0.14em;
+}
+
+.info {
+  padding: 8px 2px 16px;
+}
+
+.date {
+  margin: 0;
+  color: var(--muted);
+  font: 500 0.7rem 'Montserrat', sans-serif;
+  letter-spacing: 0.14em;
+}
+
+.title {
+  margin: 4px 0 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  font-size: 0.7rem;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px 4px 8px;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+
+  // キャラクターの色は明るさがまちまちなので、文字の背景にせず丸印で示す。
+  i {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--muted);
+  }
+}
+
+.links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.7em 1.4em;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px var(--line);
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
+
+    &::after {
+      content: '↗';
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    &:first-child {
+      background: var(--fg);
+      color: #000;
+    }
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    a:hover {
+      background: var(--fg);
+      color: #000;
+    }
+
+    a:first-child:hover {
+      background: #fff;
+    }
+  }
+}
+
+// ---- 詳細ダイアログの中身
+.sheet {
+  img {
+    display: block;
+    width: min(44vw, 70dvh);
+    height: auto;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    background: #161618 center / cover no-repeat;
+    object-fit: cover;
+    box-shadow: 0 30px 80px rgb(0 0 0 / 0.6);
+  }
+
+  [data-body] {
+    display: flex;
+    align-items: center;
+    gap: clamp(24px, 4vw, 56px);
+  }
+
+  .info {
+    width: min(380px, 36vw);
+    padding: 0;
+  }
+
+  .date {
+    font-size: 0.8rem;
+  }
+
+  .title {
+    margin: 10px 0 18px;
+    font-size: clamp(1.3rem, 2.4vw, 2rem);
+    line-height: 1.4;
+  }
+
+  .chips {
+    margin-bottom: 28px;
+    font-size: 0.8rem;
+  }
+
+  .links a {
+    font-size: 0.9rem;
+  }
+
+  @media (max-width: 720px) {
+    [data-body] {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    img {
+      width: min(86vw, 48dvh);
+      margin: 0 auto;
+    }
+
+    .info {
+      width: min(86vw, 48dvh);
+      margin: 0 auto;
+    }
+  }
+}

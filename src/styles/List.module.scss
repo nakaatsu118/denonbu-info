@@ -1,0 +1,382 @@
+// 年ごとに区切ったジャケットの一覧と、左の絞り込み。背景の壁（Wall.module.scss）の上に載せる。
+.page {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 104px 24px 64px;
+}
+
+// スクリプトが動かないと絞り込めないので、動くときだけ出す（下の :global(.js)）。
+.side,
+.tools {
+  display: none;
+}
+
+.side {
+  position: sticky;
+  top: 16px;
+  flex: none;
+  flex-direction: column;
+  gap: 4px;
+  width: 220px;
+  max-height: calc(100dvh - 32px);
+  padding: 6px;
+  overflow-y: auto;
+  border-radius: 24px;
+  background: rgb(22 22 24 / 0.72);
+  box-shadow: inset 0 0 0 1px var(--line);
+
+  input[type='search'] {
+    flex: none;
+    width: 100%;
+    height: 36px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.08);
+    color: var(--fg);
+    font: inherit;
+    font-size: 13px;
+    appearance: none;
+    -webkit-appearance: none;
+
+    &::placeholder {
+      color: var(--muted);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--fg);
+      outline-offset: 1px;
+    }
+  }
+
+  h2 {
+    margin: 14px 0 4px;
+    padding: 0 14px;
+    color: var(--muted);
+    font: 500 11px 'Montserrat', 'Zen Kaku Gothic New', sans-serif;
+    letter-spacing: 0.14em;
+  }
+}
+
+.opts {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+// ラジオボタンを、ピル型の行として見せる。
+.opt {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: pointer;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  // キャラクターの色。黒に近い色が背景に沈まないように薄い縁を付ける。
+  i {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--muted);
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.2);
+  }
+
+  span {
+    margin-left: auto;
+    color: var(--muted);
+    font: 500 11px 'Montserrat', sans-serif;
+    letter-spacing: 0.1em;
+  }
+
+  &:has(:checked) {
+    background: var(--fg);
+    color: #000;
+
+    span {
+      color: inherit;
+    }
+  }
+
+  &:has(:focus-visible) {
+    outline: 2px solid var(--fg);
+    outline-offset: 2px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:not(:has(:checked)):hover {
+      background: rgb(255 255 255 / 0.08);
+    }
+  }
+}
+
+// キャラクターは、選んだエリアの下にだけ出す。
+.members {
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 0 6px 14px;
+
+  .opt {
+    height: 32px;
+    font-size: 12px;
+
+    &:has(:checked) {
+      background: rgb(255 255 255 / 0.16);
+      color: var(--fg);
+    }
+  }
+}
+
+.opt:has(:checked) + .members {
+  display: flex;
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+}
+
+.tools {
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+
+  output {
+    color: var(--muted);
+    font: 500 11px 'Montserrat', 'Zen Kaku Gothic New', sans-serif;
+    letter-spacing: 0.1em;
+  }
+
+  select {
+    height: 36px;
+    padding: 0 30px 0 14px;
+    border: 0;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.08)
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23f4f4f2' stroke-width='1.5'/%3E%3C/svg%3E")
+      no-repeat right 12px center;
+    color: var(--fg);
+    font: inherit;
+    font-size: 13px;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid var(--fg);
+      outline-offset: 1px;
+    }
+  }
+}
+
+.year {
+  margin-bottom: 48px;
+
+  > h2 {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    margin: 0 0 14px;
+    font: 600 clamp(32px, 5vw, 48px) / 1 'Montserrat', sans-serif;
+    letter-spacing: 0.06em;
+
+    span {
+      color: var(--muted);
+      font: 500 11px 'Montserrat', 'Zen Kaku Gothic New', sans-serif;
+      letter-spacing: 0.1em;
+    }
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 24px 12px;
+}
+
+.tile {
+  min-width: 0;
+}
+
+.face {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #161618;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.2s var(--ease-out);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--fg);
+    outline-offset: 3px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover img {
+      transform: scale(1.04);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    img {
+      transition: none;
+    }
+  }
+}
+
+.meta {
+  padding-top: 8px;
+
+  h3 {
+    display: -webkit-box;
+    margin: 2px 0 0;
+    overflow: hidden;
+    font-size: 0.85rem;
+    font-weight: 500;
+    line-height: 1.5;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+}
+
+.who {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.5;
+
+  i {
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--muted);
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.2);
+  }
+
+  span {
+    min-width: 0;
+    margin-left: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.empty {
+  margin: 80px 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+:global(.js) {
+  .side,
+  .tools {
+    display: flex;
+  }
+
+  // 詳細（YouTubeと配信のリンクなど）は、ジャケットを押して開く画面に出す。
+  .tile [data-info] {
+    display: none;
+  }
+}
+
+// スクリプトが動かないときは詳細を開けないので、タイルにそのまま出す。
+:global(html:not(.js)) .meta {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .page {
+    flex-direction: column;
+    gap: 16px;
+    padding: 88px 16px 48px;
+  }
+
+  // 左の欄は入らないので、検索の下にエリアを横に並べて送れるようにする。
+  .side {
+    position: static;
+    width: 100%;
+    max-height: none;
+    padding: 0;
+    overflow: visible;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+
+    input[type='search'] {
+      font-size: 16px; // 16px未満だとiOSが入力時に画面を拡大する
+    }
+
+    h2 {
+      display: none;
+    }
+  }
+
+  .opts {
+    flex-direction: row;
+    gap: 6px;
+    margin: 4px -16px 0;
+    padding: 2px 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .opt,
+  .members .opt {
+    height: 36px;
+    font-size: 12px;
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+
+  // 選んだエリアのキャラクターは、そのエリアのすぐ右に続けて並べる。
+  .opt:has(:checked) + .members {
+    display: contents;
+  }
+
+  .tools select {
+    font-size: 16px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px 8px;
+  }
+}

@@ -1,326 +1,192 @@
-.page {
-  background-image: linear-gradient(180deg, #5d6366 0, #415460 25%, #1f4459 50%, #003553 75%, #00264d 100%);
-  background-attachment: fixed;
-  background-size: cover;
-  background-position: center;
-  color: #ffffff;
-  font-family: 'Zen Kaku Gothic New', sans-serif;
-  height: 100%;
-
-  @media screen and (max-width: 600px) {
-    width: fit-content;
-  }
-}
-
-.container {
-  padding: 0 2rem;
-
-  @media screen and (max-width: 600px) {
-    padding: 0;
-  }
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .header {
-  height: 120px;
-  display: flex;
-  padding: 16px;
-  position: sticky;
+  position: absolute; // 一覧と一緒に上へ流れる
   top: 0;
-  z-index: 100;
-
-  .headerImage {
-    width: auto;
-    height: 100%;
-  }
-
-  @media screen and (max-width: 600px) {
-    height: 100px;
-  }
-}
-
-.main {
+  right: 0;
+  left: 0;
+  z-index: 10;
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-content: stretch;
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.topContainer {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding-bottom: 60px;
+  justify-content: space-between;
+  padding: 16px 20px;
+  pointer-events: none; // ロゴとボタン以外では、下の一覧をそのまま操作できるようにする
+
+  > * {
+    pointer-events: auto;
+  }
+}
+
+.logo img {
+  display: block;
+  width: auto;
+  height: 56px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  height: 36px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(22 22 24 / 0.6);
+  box-shadow: inset 0 0 0 1px var(--line);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  color: var(--fg);
+  font: 600 11px 'Montserrat', 'Zen Kaku Gothic New', sans-serif;
+  letter-spacing: 0.18em;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+
+  &:focus-visible {
+    outline: 2px solid var(--fg);
+    outline-offset: 2px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background: var(--fg);
+      color: #000;
+    }
+  }
+}
+
+// 画面全体を覆うダイアログ。中身の外側を押すと閉じる。
+.dialog {
+  width: 100vw;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 72px 24px 32px;
+  border: 0;
+  overflow: auto;
+  background: transparent;
+  color: var(--fg);
+  opacity: 0;
+  transition:
+    opacity 0.15s ease,
+    display 0.15s allow-discrete,
+    overlay 0.15s allow-discrete;
+
+  &[open] {
+    display: grid;
+    place-items: center;
+    opacity: 1;
+    transition-duration: 0.3s;
+  }
+
+  &::backdrop {
+    background: rgb(6 6 7 / 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    opacity: 0;
+    transition:
+      opacity 0.15s ease,
+      display 0.15s allow-discrete,
+      overlay 0.15s allow-discrete;
+  }
+
+  &[open]::backdrop {
+    opacity: 1;
+    transition-duration: 0.3s;
+  }
+}
+
+.panel {
+  transition: transform 0.3s var(--ease-out);
+}
+
+@starting-style {
+  .dialog[open],
+  .dialog[open]::backdrop {
+    opacity: 0;
+  }
+
+  .dialog[open] .panel {
+    transform: scale(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel {
+    transition: none;
+  }
+}
+
+.close {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  width: 44px;
+  height: 44px;
+  padding: 0 0 2px;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.1);
+  color: var(--fg);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:focus-visible {
+    outline: 2px solid var(--fg);
+    outline-offset: 2px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background: rgb(255 255 255 / 0.2);
+    }
+  }
+}
+
+// スクリプトが動かない環境ではダイアログを開けないので、ページの末尾にそのまま表示する。
+:global(html:not(.js)) {
+  .dialog {
+    position: static;
+    display: block;
+    width: auto;
+    height: auto;
+    padding: 32px 16px;
+    opacity: 1;
+  }
+
+  .close,
+  .pill[data-open] {
+    display: none;
+  }
+}
+
+.notFound {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 12px;
+  min-height: 100dvh;
+  text-align: center;
 
   h1 {
-    font-weight: 600;
-    font-size: 1.6rem;
-    letter-spacing: 0.12em;
     margin: 0;
-
-    @media screen and (max-width: 600px) {
-      font-size: 1.4rem;
-    }
+    font: 600 clamp(4rem, 16vw, 9rem) / 1 'Montserrat', sans-serif;
+    letter-spacing: 0.06em;
   }
-
-  h2 {
-    font-weight: 100;
-    font-size: 0.65rem;
-    margin: 0;
-  }
-}
-
-.musicContainer {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  align-items: center;
-  width: calc((100% - 780px) / 2);
-  min-width: 300px;
-  margin: 8px;
-  background: #2c2c2c87;
-  animation: fadeIn 1s ease 0.5s 1 normal backwards;
-
-  @media screen and (max-width: 600px) {
-    min-width: 140px;
-    width: 46%;
-    margin: 4px;
-  }
-
-  .releaseDate {
-    width: 100%;
-    justify-content: left;
-    color: #888888;
-    font-family: 'Montserrat', sans-serif;
-    letter-spacing: 0.12em;
-    padding-left: 0.6rem;
-
-    @media screen and (max-width: 600px) {
-      font-size: 1rem;
-    }
-
-    span {
-      font-size: 0.6rem;
-      font-weight: 600;
-    }
-  }
-
-  .musicTitle {
-    font-size: 0.7rem;
-    font-weight: 400;
-    padding-left: 0.8rem;
-    padding-right: 0.8rem;
-    min-height: 40px;
-
-    @media screen and (max-width: 600px) {
-      min-height: auto;
-    }
-  }
-
-  .imageAndLinkContainer {
-    display: flex;
-    flex-direction: row;
-    height: auto;
-    align-items: stretch;
-  }
-
-  .imageContainer {
-    width: 100%;
-    height: 240px;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    @media screen and (max-width: 600px) {
-      height: auto;
-    }
-  }
-
-  .jacketImage {
-    min-height: 240px;
-    width: auto;
-    height: 240px;
-    vertical-align: top;
-    z-index: 10;
-
-    @media screen and (max-width: 600px) {
-      width: 100%;
-      height: auto;
-      min-height: auto;
-    }
-  }
-
-  .backImageContainer {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-
-    @media screen and (max-width: 600px) {
-      display: none;
-    }
-  }
-
-  .backImage {
-    height: 100%;
-    width: 100%;
-    filter: blur(10px);
-  }
-
-  .linksAndCharacterContainer {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .links {
-    height: 100%;
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    padding: 12px;
-    gap: 16px;
-
-    @media screen and (max-width: 600px) {
-      flex-direction: column;
-      height: auto;
-      gap: 8px;
-    }
-
-    .button a {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: relative;
-      margin: 0 auto;
-      padding: 0.8em 1.8em;
-      width: 100px;
-      font-size: 12px;
-      font-weight: 500;
-      box-shadow: 0px 0px 0px 1px #fafafa;
-      border-radius: 50vh;
-      transition: 0.3s;
-
-      .buttonText {
-        padding-bottom: 0.2rem;
-      }
-    }
-
-    .button a::after {
-      content: '';
-      width: 5px;
-      height: 5px;
-      border-top: 2px solid #fafafa;
-      border-right: 2px solid #fafafa;
-      transform: rotate(45deg);
-      transition: 0.3s;
-    }
-
-    .button a:hover::before {
-      top: 0;
-      left: 0;
-    }
-
-    .button a:hover {
-      text-decoration: none;
-      color: #333333;
-      background-color: #fafafa;
-      box-shadow: none;
-    }
-
-    .button a:hover::after {
-      border-top: 2px solid #333333;
-      border-right: 2px solid #333333;
-    }
-  }
-
-  .areas {
-    display: flex;
-    font-size: 0.7rem;
-    position: absolute;
-    bottom: 0px;
-    left: 0px;
-    background-color: #000000;
-
-    @media screen and (max-width: 600px) {
-      font-size: 1rem;
-    }
-
-    .area {
-      padding: 4px;
-    }
-  }
-
-  .characters {
-    display: flex;
-    font-size: 0.6rem;
-    font-weight: normal;
-    padding: 0 12px 14px 12px;
-    gap: 4px;
-    margin-top: auto;
-
-    .character {
-      padding: 6px;
-      border-radius: 8px;
-    }
-  }
-}
-
-.musicButton {
-  display: flex;
-  justify-content: center;
-  padding: 40px;
 
   p {
-    width: fit-content;
-    text-align: center;
-    font-size: 1rem;
-    padding: 0.8em 1.8em;
-    font-weight: 500;
-    text-decoration: none;
-    box-shadow: 0px 0px 0px 1px #fafafa;
-    border-radius: 50vh;
-    transition: 0.3s;
-  }
-
-  p:hover {
-    text-decoration: none;
-    color: #333333;
-    background-color: #fafafa;
-    box-shadow: none;
-  }
-}
-
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.blur{
-	animation-name: blurAnime;
-	animation-duration: 0.7s;
-	animation-fill-mode: forwards;
-}
-
-@keyframes blurAnime{
-  from {
-	filter: blur(10px);
-	transform: scale(1.02);
-  }
-
-  to {
-	filter: blur(0);
-	transform: scale(1);
+    margin: 0 0 20px;
+    color: var(--muted);
+    font-size: 0.9rem;
   }
 }
