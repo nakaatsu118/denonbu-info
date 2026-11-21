@@ -1,0 +1,781 @@
+// 年ごとに区切ったジャケットの一覧と、左の絞り込み。背景の壁（Wall.module.scss）の上に載せる。
+.page {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: 48px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 112px 32px 80px;
+}
+
+// スクリプトが動かないと絞り込めないので、動くときだけ出す（下の :global(.js)）。
+.side,
+.tools {
+  display: none;
+}
+
+.side {
+  position: sticky;
+  top: 16px;
+  flex: none;
+  flex-direction: column;
+  width: 248px;
+  max-height: calc(100dvh - 32px);
+  padding: 8px;
+  // 画面が低くて入りきらないときは中で送れるが、スクロールバーは出さない。
+  overflow: hidden auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  border-radius: 28px;
+  background: rgb(22 22 24 / 0.72);
+  box-shadow: inset 0 0 0 1px var(--line);
+
+  input[type='search'] {
+    flex: none;
+    width: 100%;
+    height: 40px;
+    padding: 0 16px;
+    border: 0;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.08);
+    color: var(--fg);
+    font: inherit;
+    font-size: 14px;
+    appearance: none;
+    -webkit-appearance: none;
+
+    &::placeholder {
+      color: var(--muted);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--fg);
+      outline-offset: 1px;
+    }
+  }
+
+  h2 {
+    margin: 18px 0 4px;
+    padding: 0 16px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+  }
+}
+
+.opts {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+// マウスを載せた行へ滑っていくハイライト。位置と大きさはスクリプトが決める。
+.hover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.1);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.15s ease,
+    transform 0.2s var(--ease-out),
+    width 0.2s var(--ease-out),
+    height 0.2s var(--ease-out);
+
+  &[data-on] {
+    opacity: 1;
+  }
+}
+
+// ラジオボタンを、ピル型の行として見せる。
+.opt {
+  position: relative;
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 40px;
+  margin-top: 4px;
+  padding: 0 16px;
+  border-radius: 999px;
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: var(--cursor-hand);
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.12s var(--ease-out);
+
+  input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  // キャラクターの色。黒に近い色が背景に沈まないように薄い縁を付ける。
+  i {
+    flex: none;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--muted);
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.2);
+  }
+
+  span {
+    margin-left: auto;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    transition: color 0.15s ease;
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &:has(:checked) {
+    background: var(--fg);
+    color: #000;
+
+    span {
+      color: inherit;
+    }
+  }
+
+  &:has(:focus-visible) {
+    outline: 2px solid var(--fg);
+    outline-offset: 2px;
+  }
+}
+
+// キャラクターは、選んだエリアの下に開く。高さ0から中身の高さまで伸ばす。
+.members {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden; // 閉じている間は、Tabキーでも中に入らせない
+  transition:
+    grid-template-rows 0.3s var(--ease-out),
+    visibility 0s 0.3s;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding-left: 16px;
+    overflow: hidden;
+  }
+
+  .opt {
+    height: 36px;
+    font-size: 13px;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease,
+      opacity 0.2s ease,
+      transform 0.3s var(--ease-out);
+
+    &:last-child {
+      margin-bottom: 6px;
+    }
+
+    &:has(:checked) {
+      background: rgb(255 255 255 / 0.18);
+      color: var(--fg);
+    }
+  }
+}
+
+.opt:has(:checked) + .members {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition-delay: 0s;
+
+  .opt {
+    opacity: 1;
+    transform: none;
+
+    // 上から順に、少しずつ遅らせて現す。
+    @for $i from 1 through 4 {
+      &:nth-child(#{$i}) {
+        transition-delay: 0s, 0s, #{$i * 40}ms, #{$i * 40}ms;
+      }
+    }
+
+    &:active {
+      transform: scale(0.97);
+      transition-delay: 0s;
+    }
+  }
+}
+
+.body {
+  flex: 1;
+  min-width: 0;
+}
+
+.tools {
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+
+  output {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+// モバイルだけに出す、絞り込みのシートを開くボタンと、シートの見出し、後ろを暗くする幕。
+.filterBtn,
+.sheetHead,
+.scrim {
+  display: none;
+}
+
+.filterBtn {
+  position: relative;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.08);
+  color: var(--fg);
+  cursor: var(--cursor-hand);
+  transition:
+    background-color 0.15s ease,
+    transform 0.12s var(--ease-out);
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--fg);
+    outline-offset: 2px;
+  }
+
+  // 絞り込み中の印
+  &[data-active]::after {
+    content: '';
+    position: absolute;
+    top: 9px;
+    right: 9px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--fg);
+    box-shadow: 0 0 0 2px #1d1d20;
+  }
+}
+
+// シートの中を送っても、見出しとボタンは上に残す。
+.sheetHead {
+  position: sticky;
+  top: -8px; // シートの上の余白（padding）ぶん持ち上げて、上端に付ける
+  z-index: 1;
+  align-items: center;
+  justify-content: space-between;
+  margin: -8px -8px 8px;
+  padding: 12px 12px 8px 20px;
+  border-radius: 28px 28px 0 0;
+  background: rgb(22 22 24 / 0.98);
+
+  p {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 500;
+  }
+}
+
+.headBtns {
+  display: flex;
+  gap: 8px;
+}
+
+.clear {
+  height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.1);
+  color: var(--fg);
+  font: inherit;
+  font-size: 14px;
+  cursor: var(--cursor-hand);
+  animation: fade-in 0.2s var(--ease-out);
+  transition: transform 0.12s var(--ease-out);
+
+  &[hidden] {
+    display: none;
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--fg);
+    outline-offset: 2px;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+.done {
+  height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--fg);
+  color: #000;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  cursor: var(--cursor-hand);
+  transition: transform 0.12s var(--ease-out);
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--fg);
+    outline-offset: 2px;
+  }
+}
+
+// 押すたびに新しい順と古い順が入れ替わるボタン。矢印が上下に回る。
+.sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.08);
+  color: var(--fg);
+  font: inherit;
+  font-size: 14px;
+  cursor: var(--cursor-hand);
+  transition:
+    background-color 0.15s ease,
+    transform 0.12s var(--ease-out);
+
+  svg {
+    transition: transform 0.3s var(--ease-in-out);
+  }
+
+  &[data-asc] svg {
+    transform: rotate(180deg);
+  }
+
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--fg);
+    outline-offset: 2px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background: rgb(255 255 255 / 0.16);
+    }
+  }
+}
+
+.year {
+  margin-bottom: 72px;
+
+  > h2 {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin: 0 0 24px;
+    font-size: clamp(40px, 5vw, 60px);
+    font-weight: 600;
+    line-height: 1;
+
+    span {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 500;
+    }
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 40px 26px; // 横の間隔は、マウスオーバーの選択枠が隣のジャケットに近づきすぎない幅にする
+}
+
+.tile {
+  min-width: 0;
+}
+
+.face {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: #161618;
+  color: inherit;
+  font: inherit;
+  cursor: var(--cursor-hand);
+  transition: transform 0.35s var(--ease-out);
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+    object-fit: cover;
+    transition: box-shadow 0.35s var(--ease-out);
+  }
+
+  // 切り抜きの選択枠。動く点線（::before）と、四隅の角（::after）。
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    pointer-events: none;
+    opacity: 0;
+    filter: drop-shadow(0 0 1px rgb(0 0 0 / 0.7)); // 明るいジャケットの上でも線が見えるようにする
+    transition: opacity 0.2s ease;
+  }
+
+  &::before {
+    inset: -5px;
+    background:
+      linear-gradient(90deg, #fff 50%, transparent 0) 0 0 / 10px 1.5px repeat-x,
+      linear-gradient(90deg, #fff 50%, transparent 0) 0 100% / 10px 1.5px repeat-x,
+      linear-gradient(#fff 50%, transparent 0) 0 0 / 1.5px 10px repeat-y,
+      linear-gradient(#fff 50%, transparent 0) 100% 0 / 1.5px 10px repeat-y;
+  }
+
+  &::after {
+    inset: -8px;
+    background:
+      linear-gradient(#fff, #fff) 0 0 / 7px 7px no-repeat,
+      linear-gradient(#fff, #fff) 100% 0 / 7px 7px no-repeat,
+      linear-gradient(#fff, #fff) 0 100% / 7px 7px no-repeat,
+      linear-gradient(#fff, #fff) 100% 100% / 7px 7px no-repeat;
+  }
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  &:focus-visible::before,
+  &:focus-visible::after {
+    opacity: 1;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      transform: translateY(-4px);
+
+      img {
+        box-shadow: 0 18px 40px rgb(0 0 0 / 0.55);
+      }
+
+      &::before,
+      &::after {
+        opacity: 1;
+      }
+
+      &::before {
+        animation: marching-ants 0.6s linear infinite;
+      }
+    }
+  }
+}
+
+// 点線を、枠に沿って回るように送る。
+@keyframes marching-ants {
+  to {
+    background-position:
+      10px 0,
+      -10px 100%,
+      0 -10px,
+      100% 10px;
+  }
+}
+
+.meta {
+  padding-top: 14px;
+  text-shadow: 0 1px 10px rgb(0 0 0 / 0.55); // 後ろが明るいジャケットでも文字を読めるようにする
+
+  h3 {
+    display: -webkit-box;
+    margin: 8px 0 0;
+    overflow: hidden;
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 1.45;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+  }
+}
+
+// 日付と、その右に並べるキャラクターの色。名前は詳細と、丸に載せたときの表示で分かる。
+.line {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+
+  span {
+    margin-right: 5px;
+    color: rgb(255 255 255 / 0.82);
+  }
+
+  i {
+    flex: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--muted);
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.2);
+  }
+}
+
+.empty {
+  margin: 80px 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+  text-align: center;
+}
+
+:global(.js) {
+  .side,
+  .tools {
+    display: flex;
+  }
+
+  // 詳細（YouTubeと配信のリンクなど）は、ジャケットを押して開く画面に出す。
+  .tile [data-info] {
+    display: none;
+  }
+}
+
+// スクリプトが動かないときは詳細を開けないので、タイルにそのまま出す。
+:global(html:not(.js)) .meta {
+  display: none;
+}
+
+// ---- 最初の表示：背景の壁が飛び出し、すりガラスがかかり始めたら、左の欄、見出し、ジャケットの順に下から現す
+:global(.js) .page[data-intro] {
+  .side {
+    animation: intro-side 0.7s var(--ease-out) 1s backwards;
+  }
+
+  .tools,
+  .year:first-of-type > h2 {
+    animation: intro-rise 0.7s var(--ease-out) 1.1s backwards;
+  }
+
+  // 最初の年のジャケットを、左上から順に少しずつ遅らせる。画面の外のものは最後の遅れでまとめて出す。
+  .tile {
+    animation: intro-rise 0.8s var(--ease-out) 1.9s backwards;
+  }
+
+  @for $i from 1 through 14 {
+    .year:first-of-type .tile:nth-child(#{$i}) {
+      animation-delay: #{1.15s + $i * 0.05s};
+    }
+  }
+}
+
+@keyframes intro-side {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+}
+
+@keyframes intro-rise {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.97);
+  }
+}
+
+@keyframes intro-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  // 動きは減らし、現れるだけにする。
+  :global(.js) .page[data-intro] :is(.side, .tools, .year > h2, .tile) {
+    animation-name: intro-fade;
+  }
+
+  .hover,
+  .opt,
+  .members,
+  .members .opt,
+  .sort svg,
+  .face,
+  .face img {
+    transition: none;
+  }
+
+  // 持ち上げと点線の流れはやめ、選択枠が現れるだけにする。
+  .face:hover {
+    transform: none !important;
+  }
+
+  .face:hover::before {
+    animation: none !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .page {
+    flex-direction: column;
+    gap: 20px;
+    padding: 96px 16px 56px;
+
+    &[data-sheet] {
+      z-index: 11; // 開いている間は、ヘッダーより上に出す
+    }
+  }
+
+  // 絞り込みは、左上のボタンで下から出すシートにする。中身はPCの左の欄と同じ。
+  .side {
+    position: fixed;
+    inset: auto 8px max(8px, env(safe-area-inset-bottom)) 8px;
+    z-index: 2;
+    width: auto;
+    max-height: min(82dvh, 680px);
+    padding: 8px 8px 12px;
+    background: rgb(22 22 24 / 0.94);
+    box-shadow:
+      inset 0 0 0 1px var(--line),
+      0 -12px 48px rgb(0 0 0 / 0.5);
+    transform: translateY(calc(100% + 16px));
+    visibility: hidden;
+    transition:
+      transform 0.4s cubic-bezier(0.32, 0.72, 0, 1),
+      visibility 0s 0.4s;
+
+    input[type='search'] {
+      height: 44px;
+      font-size: 16px; // 16px未満だとiOSが入力時に画面を拡大する
+    }
+  }
+
+  .page[data-sheet] .side {
+    transform: none;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+
+  .scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    display: block;
+    padding: 0;
+    border: 0;
+    background: rgb(0 0 0 / 0.55);
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 0.3s ease,
+      visibility 0s 0.3s;
+  }
+
+  .page[data-sheet] .scrim {
+    opacity: 1;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+
+  .sheetHead {
+    display: flex;
+  }
+
+  .filterBtn {
+    display: inline-grid;
+  }
+
+  .hover {
+    display: none;
+  }
+
+  .opt {
+    height: 44px;
+    font-size: 15px;
+  }
+
+  .members .opt {
+    height: 40px;
+    font-size: 14px;
+  }
+
+  .tools {
+    margin-bottom: 20px;
+  }
+
+  .sort {
+    height: 44px;
+    font-size: 15px;
+  }
+
+  .year {
+    margin-bottom: 56px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 12px;
+  }
+
+  .meta h3 {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 720px) and (prefers-reduced-motion: reduce) {
+  .side,
+  .scrim {
+    transition: none;
+  }
+}

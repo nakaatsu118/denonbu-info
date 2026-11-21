@@ -1,0 +1,27 @@
+---
+import shell from '../styles/Home.module.scss';
+import styles from '../styles/Song.module.scss';
+---
+
+<dialog class={`${shell.dialog} ${styles.sheet}`} data-song-dialog aria-label="楽曲の詳細">
+  <div class={shell.panel} data-body></div>
+  <button class={shell.close} type="button" data-close aria-label="閉じる">×</button>
+</dialog>
+
+<script>
+  // ジャケット（data-face）を押すと、そのタイル（data-tile）に持たせた情報を複製して全面に開く。
+  const dialog = document.querySelector<HTMLDialogElement>('[data-song-dialog]')!;
+  const body = dialog.querySelector<HTMLElement>('[data-body]')!;
+
+  document.addEventListener('click', (e) => {
+    const tile = (e.target as Element).closest('[data-face]')?.closest('[data-tile]');
+    if (!tile) return;
+    const thumb = tile.querySelector('img')!;
+    const large = new Image(960, 960);
+    large.src = thumb.dataset.large!;
+    large.alt = thumb.alt;
+    large.style.backgroundImage = `url("${thumb.currentSrc}")`; // 大きい画像が届くまで、読み込み済みの画像を敷く
+    body.replaceChildren(large, tile.querySelector('[data-info]')!.cloneNode(true));
+    dialog.showModal();
+  });
+</script>

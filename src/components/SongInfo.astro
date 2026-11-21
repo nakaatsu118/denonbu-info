@@ -1,0 +1,48 @@
+---
+import styles from '../styles/Song.module.scss';
+import { formatDate } from '../lib/microcms';
+import type { Song } from '../types/song';
+
+interface Props {
+  song: Song;
+}
+const { song } = Astro.props;
+---
+
+<div class={styles.info} data-info>
+  <p class={styles.date}>{formatDate(song.release_date)}</p>
+  <h2 class={styles.title}>{song.title}</h2>
+  <ul class={styles.chips}>
+    {
+      song.all_flag ? (
+        <li>
+          <i style={{ backgroundColor: 'red' }} />
+          電音部
+        </li>
+      ) : (
+        song.characters.map((character) => (
+          <li>
+            <i style={{ backgroundColor: character.color }} />
+            {character.name}
+          </li>
+        ))
+      )
+    }
+  </ul>
+  <div class={styles.links}>
+    {
+      song.youtube && (
+        <a href={song.youtube} target="_blank" rel="noopener noreferrer">
+          YouTube
+        </a>
+      )
+    }
+    {
+      song.streaming_link && (
+        <a href={song.streaming_link} target="_blank" rel="noopener noreferrer">
+          配信Link
+        </a>
+      )
+    }
+  </div>
+</div>

@@ -27,7 +27,7 @@ npm run build
 npm start
 ```
 
-ビルドは楽曲を全件取得し、取得件数が`totalCount`と合わなければ失敗します。URLは旧サイトと同じ`/`と`/music/1`〜`/music/N`です。末尾にスラッシュを付けたURLは付けないURLへ転送し、存在しないURLには`404.html`を返します。
+ビルドは楽曲を全件取得し、取得件数が`totalCount`と合わなければ失敗します。ページは`/`だけです。年ごとの一覧から曲を探す画面で、背景にはジャケットの壁が流れます。旧サイトの`/music`と`/music/1`〜`/music/N`は`public/_redirects`で`/`へ転送します。末尾にスラッシュを付けたURLは付けないURLへ転送し、存在しないURLには`404.html`を返します。
 
 ## デプロイ
 
@@ -35,9 +35,9 @@ npm start
 
 ## ディレクトリ
 
-- `src/pages` : ページ。`music/[id].astro`で一覧のページ送りを生成します。
-- `src/layouts` : meta情報、GTM、ヘッダー、フッターを含む共通レイアウト。
-- `src/components` : コンポーネント。
-- `src/lib` : microCMSからの取得と日付の整形。
+- `src/pages` : ページ。`index.astro`が一覧と背景の壁を表示します。
+- `src/layouts` : meta情報、GTM、ヘッダー、ABOUTのダイアログを含む共通レイアウト。
+- `src/components` : コンポーネント。`SongGrid.astro`が年ごとの一覧と絞り込み、`SongWall.astro`が背景に流すジャケットの壁です。楽曲の詳細表示は`SongDialog.astro`と`SongInfo.astro`にあります。
+- `src/lib` : microCMSからの取得と日付の整形。取得した曲はリリース日の新しい順に並べます。
 - `src/styles` : SCSSのスタイル。コンポーネント用はCSS Modules（`*.module.scss`）にします。
 - `src/types` : 型定義。

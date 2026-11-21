@@ -1,0 +1,119 @@
+---
+import styles from '../styles/Wall.module.scss';
+import { image } from '../lib/microcms';
+import type { Song } from '../types/song';
+
+interface Props {
+  songs: Song[];
+}
+const { songs } = Astro.props;
+---
+
+<!-- 一覧の背景に流す飾り。曲の情報は一覧（SongGrid）にあるので、読み上げと操作の対象から外す。 -->
+<div class={styles.wall} aria-hidden="true">
+  <div class={styles.stage} data-wall>
+    {
+      songs.map((song) => (
+        <div class={styles.tile} data-tile>
+          <img src={image(song.jacket_image.url, 240)} alt="" width="240" height="240" loading="lazy" decoding="async" />
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<script>
+  const wall = document.querySelector<HTMLElement>('[data-wall]')!;
+  const tiles = [...wall.querySelectorAll<HTMLElement>('[data-tile]')];
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // 読み込むたびに並びを変える。位置は配列の順で決まるので、配列だけ混ぜる。
+  for (let i = tiles.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [tiles[i], tiles[j]] = [tiles[j], tiles[i]];
+  }
+
+  const GAP = 12;
+  const DRIFT = 12; // 流れる速さ（px/秒）
+  const MAX = 1.2; // 中央からこの角度（rad）より外のタイルは描画しない
+  const INTRO_MS = 1500;
+
+  let rows = 3;
+  let pitch = 0;
+  let radius = 0;
+  let drift = 0; // 流れた量（px）。段ごとに逆向きへ足す
+  let intro = !reduce;
+  let dirty = true;
+
+  const measure = () => {
+    const w = wall.clientWidth;
+    const h = wall.clientHeight;
+    if (!w || !h) return; // まだ大きさが決まっていない。決まった時点でResizeObserverが呼び直す
+    // 段の合計を画面より少し高くして、壁が画面の外まで続いて見えるようにする。
+    rows = Math.max(3, Math.round((h * 1.1) / Math.min(320, w * 0.45)));
+    const size = (h * 1.1 - GAP * (rows - 1)) / rows;
+    pitch = size + GAP;
+    radius = w * 0.95;
+    wall.style.setProperty('--size', `${size}px`);
+    wall.style.perspective = `${w * 1.1}px`;
+    dirty = true;
+    if (intro && !('intro' in wall.dataset)) burst();
+  };
+
+  // 最初の一度だけ、中央から各タイルの位置へ飛び出させる。
+  const burst = () => {
+    tiles.forEach((el, k) => {
+      const [s, y] = place(k);
+      if (Math.abs(s / radius) > MAX) return;
+      el.style.setProperty('--bx', `${-s}px`);
+      el.style.setProperty('--by', `${-y}px`);
+      el.style.setProperty('--delay', `${Math.hypot(s, y) / 5}ms`);
+    });
+    wall.dataset.intro = '';
+    setTimeout(() => {
+      intro = false;
+      delete wall.dataset.intro;
+    }, INTRO_MS);
+  };
+
+  // k 番目のタイルの、円筒面に沿った横位置と縦位置を返す。段ごとに一周させる。
+  const place = (k: number): [number, number] => {
+    const r = k % rows;
+    const len = Math.ceil((tiles.length - r) / rows) * pitch;
+    let s = (Math.floor(k / rows) * pitch + (r % 2 ? -drift : drift)) % len;
+    if (s < 0) s += len;
+    if (s >= len / 2) s -= len;
+    return [s, (r - (rows - 1) / 2) * pitch];
+  };
+
+  const render = () => {
+    tiles.forEach((el, k) => {
+      const [s, y] = place(k);
+      const angle = s / radius;
+      if (Math.abs(angle) > MAX) {
+        el.style.display = 'none';
+        return;
+      }
+      el.style.display = 'block';
+      el.style.transform = `translate3d(0, ${y}px, ${-radius}px) rotateY(${angle}rad) translateZ(${radius}px)`;
+    });
+  };
+
+  let last = performance.now();
+  const tick = (now: number) => {
+    const dt = Math.min(now - last, 50) / 1000;
+    last = now;
+    requestAnimationFrame(tick);
+    if (!pitch) return; // 計測前
+    // 詳細やABOUTを開いている間は、後ろで動かさない。
+    if (!reduce && !intro && !document.querySelector('dialog[open]')) {
+      drift += DRIFT * dt;
+      dirty = true;
+    }
+    if (dirty) render();
+    dirty = false;
+  };
+
+  new ResizeObserver(measure).observe(wall);
+  requestAnimationFrame(tick);
+</script>

@@ -16,10 +16,10 @@ export interface Character {
   name: string
   furigana: string
   english_name: string
-  area: Area
+  area: Area | null
   height: string
   age?: string
   birth_date?: string
   voice_actor?: string
-  color: string
+  color?: string
 }
