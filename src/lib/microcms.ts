@@ -1,3 +1,4 @@
+import { fold } from './fold';
 import type { Song } from '../types/song';
 
 const LIMIT = 100;
@@ -32,12 +33,13 @@ export const ALL = 'all'; // 全員曲（all_flag）をエリアの選択肢と�
 
 export const image = (url: string, width: number) => `${url}?w=${width}&fm=webp`;
 
-// 検索は全角半角と大文字小文字を区別しない。クライアント側のスクリプトと同じ正規化にする。
-export const searchKey = (song: Song) =>
-  [song.title, ...song.characters.map((c) => c.name), ...song.area.map((a) => a.name)]
-    .join(' ')
-    .normalize('NFKC')
-    .toLowerCase();
+// 検索の対象にする文字列。曲名、キャラクターの名前とふりがな、エリア名を入れる。
+// 名前とふりがなは、姓と名の間の空白を詰めた形でも引けるようにする。
+export const searchKey = (song: Song) => {
+  const names = song.characters.flatMap((c) => [c.name, c.furigana]).filter(Boolean);
+  const words = [song.title, ...names, ...names.map((name) => name.replace(/\s+/g, '')), ...song.area.map((a) => a.name)];
+  return fold([...new Set(words)].join(' '));
+};
 
 // 旧サイトはUTCのビルド環境で date-fns の format を使っていたため、UTCの日付で表示する。
 export const formatDate = (iso: string) => new Date(iso).toISOString().slice(0, 10).replaceAll('-', '.');

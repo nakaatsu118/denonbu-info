@@ -17,7 +17,8 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: rgb(10 10 11 / 0.58);
+      background: rgb(10 10 11 / 0.48);
+      animation: frost-veil 1.1s var(--ease-in-out) 0.9s backwards;
     }
   }
 
@@ -25,8 +26,10 @@
   // ponytail: 画面全体を毎フレームぼかし直す。重い端末が出てきたら、壁を縮小して描くか流れを止める。
   .stage {
     position: absolute;
-    inset: -28px; // ぼかしで縁が暗く欠けないように、画面より少し大きく描く
-    filter: blur(14px) saturate(1.2);
+    inset: -14px; // ぼかしで縁が暗く欠けないように、画面より少し大きく描く
+    filter: blur(7px) saturate(1.15);
+    // 最初はくっきり見せ、壁が並び終わるころにすりガラスをかける。
+    animation: frost-in 1.1s var(--ease-in-out) 0.9s backwards;
   }
 
   .tile {
@@ -51,6 +54,25 @@
 
   .stage[data-intro] img {
     animation: burst 0.9s var(--ease-out) var(--delay, 0ms) backwards;
+  }
+}
+
+@keyframes frost-in {
+  from {
+    filter: blur(0) saturate(1);
+  }
+}
+
+@keyframes frost-veil {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :global(.js) .stage,
+  :global(.js) .wall::after {
+    animation: none;
   }
 }
 

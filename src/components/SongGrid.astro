@@ -39,10 +39,18 @@ const years = [...Map.groupBy(songs, (song) => formatDate(song.release_date).sli
 const eager = new Set(songs.slice(0, EAGER_COUNT));
 ---
 
-<form class={styles.page} data-filters>
+<form class={styles.page} data-filters data-intro>
   <h1 class={shell.srOnly}>DENONBU MUSIC INFO - 電音部楽曲情報</h1>
 
-  <div class={styles.side} role="search">
+  <button class={styles.scrim} type="button" data-filter-close tabindex="-1" aria-hidden="true"></button>
+  <div class={styles.side} id="filters" role="search">
+    <div class={styles.sheetHead}>
+      <p>絞り込み</p>
+      <div class={styles.headBtns}>
+        <button class={styles.clear} type="button" data-clear hidden>クリア</button>
+        <button class={styles.done} type="button" data-filter-close><span data-sheet-count>{songs.length}</span>曲を表示</button>
+      </div>
+    </div>
     <input type="search" name="q" placeholder="曲名・キャラクター" aria-label="検索" autocomplete="off" />
     <h2 id="area-title">エリア</h2>
     <div class={styles.opts} role="radiogroup" aria-labelledby="area-title" data-opts>
@@ -83,6 +91,19 @@ const eager = new Set(songs.slice(0, EAGER_COUNT));
   <main class={styles.body}>
     <div class={styles.tools}>
       <output data-count>{songs.length}曲</output>
+      <div class={styles.actions}>
+      <button
+        class={styles.filterBtn}
+        type="button"
+        data-filter-open
+        aria-label="絞り込み"
+        aria-controls="filters"
+        aria-expanded="false"
+      >
+        <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
+          <path d="M2.5 5h13M5 9h8M7.5 13h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"></path>
+        </svg>
+      </button>
       <button class={styles.sort} type="button" data-sort>
         <span data-sort-label>新しい順</span>
         <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
@@ -95,6 +116,7 @@ const eager = new Set(songs.slice(0, EAGER_COUNT));
             stroke-linejoin="round"></path>
         </svg>
       </button>
+      </div>
     </div>
     <div data-years>
       {
@@ -128,16 +150,17 @@ const eager = new Set(songs.slice(0, EAGER_COUNT));
                     />
                   </button>
                   <div class={styles.meta}>
-                    <p class={songStyles.date}>{formatDate(song.release_date).slice(5)}</p>
-                    <h3>{song.title}</h3>
-                    <p class={styles.who}>
+                    <p class={styles.line}>
+                      <span class={songStyles.date}>{formatDate(song.release_date).slice(5)}</span>
                       {song.all_flag ? (
-                        <i style={{ backgroundColor: 'red' }} />
+                        <i style={{ backgroundColor: 'red' }} title="電音部" />
                       ) : (
-                        song.characters.map((character) => <i style={{ backgroundColor: character.color }} />)
+                        song.characters.map((character) => (
+                          <i style={{ backgroundColor: character.color }} title={character.name} />
+                        ))
                       )}
-                      <span>{song.all_flag ? '電音部' : song.characters.map((c) => c.name).join('・')}</span>
                     </p>
+                    <h3>{song.title}</h3>
                   </div>
                   <SongInfo song={song} />
                 </article>
@@ -154,6 +177,8 @@ const eager = new Set(songs.slice(0, EAGER_COUNT));
 <SongDialog />
 
 <script>
+  import { fold } from '../lib/fold';
+
   const form = document.querySelector<HTMLFormElement>('[data-filters]')!;
   const years = form.querySelector<HTMLElement>('[data-years]')!;
   const sections = [...years.querySelectorAll<HTMLElement>('[data-year]')];
@@ -163,6 +188,9 @@ const eager = new Set(songs.slice(0, EAGER_COUNT));
   const sort = form.querySelector<HTMLElement>('[data-sort]')!;
   const opts = form.querySelector<HTMLElement>('[data-opts]')!;
   const hover = opts.querySelector<HTMLElement>('[data-hover]')!;
+  const filterBtn = form.querySelector<HTMLElement>('[data-filter-open]')!;
+  const sheetCount = form.querySelector<HTMLElement>('[data-sheet-count]')!;
+  const clear = form.querySelector<HTMLElement>('[data-clear]')!;
   const checkedChars = () => form.querySelectorAll<HTMLInputElement>('[name="char"]:checked');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -174,7 +202,7 @@ const eager = new Set(songs.slice(0, EAGER_COUNT));
 
   const filter = () => {
     const data = new FormData(form);
-    const words = String(data.get('q')).normalize('NFKC').toLowerCase().split(/\s+/).filter(Boolean);
+    const words = fold(String(data.get('q'))).split(/\s+/).filter(Boolean);
     const area = String(data.get('area') ?? '');
     const char = String(data.get('char') ?? '');
     lastChar = char;
@@ -194,7 +222,11 @@ const eager = new Set(songs.slice(0, EAGER_COUNT));
       total += shown;
     }
     count.textContent = `${total}曲`;
+    sheetCount.textContent = String(total);
     empty.hidden = total > 0;
+    const active = words.length > 0 || !!area || !!char;
+    filterBtn.toggleAttribute('data-active', active); // 絞り込み中の印
+    clear.hidden = !active;
   };
 
   // 並びは最初から新しい順なので、年と曲をそれぞれ逆順に入れ直すだけで切り替わる。
@@ -275,6 +307,37 @@ const eager = new Set(songs.slice(0, EAGER_COUNT));
   opts.addEventListener('transitionend', (e) => {
     if (e.propertyName === 'grid-template-rows' && hover.hasAttribute('data-on')) moveHover(opts.querySelector('label:hover'));
   });
+
+  // --- モバイルでは、絞り込みを下から出すシートにする（CSSで幅が狭いときだけ）
+  const setSheet = (open: boolean) => {
+    form.toggleAttribute('data-sheet', open);
+    filterBtn.setAttribute('aria-expanded', String(open));
+    document.documentElement.style.overflow = open ? 'hidden' : ''; // 開いている間は後ろの一覧を送らない
+  };
+  filterBtn.addEventListener('click', () => setSheet(true));
+  // 検索とエリア、キャラクターをまとめて外し、「すべて」に戻す。シートは開いたままにする。
+  clear.addEventListener('click', () => {
+    form.q.value = '';
+    form.querySelector<HTMLInputElement>('[name="area"][value=""]')!.checked = true;
+    for (const el of checkedChars()) el.checked = false;
+    transition(filter);
+  });
+  form.addEventListener('click', (e) => {
+    if ((e.target as Element).closest('[data-filter-close]')) setSheet(false);
+  });
+  addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && form.hasAttribute('data-sheet')) setSheet(false);
+  });
+  // 開いたまま画面を広げたら、PCの左の欄に戻す。
+  matchMedia('(min-width: 721px)').addEventListener('change', (e) => e.matches && setSheet(false));
+
+  // 最初の表示の動き（CSS）は一度きり。並び替えや絞り込みで要素を入れ直すと動きが再生し直されるので、
+  // 終わったら、または先に操作されたら止める。
+  const INTRO_MS = 2700;
+  const endIntro = () => form.removeAttribute('data-intro');
+  setTimeout(endIntro, INTRO_MS);
+  form.addEventListener('pointerdown', endIntro, { once: true });
+  form.addEventListener('keydown', endIntro, { once: true });
 
   filter(); // 再読み込みでフォームの値が復元されていても、表示を合わせる
 </script>

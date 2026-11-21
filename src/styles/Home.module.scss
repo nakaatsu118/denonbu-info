@@ -44,7 +44,7 @@
   color: var(--fg);
   font: 600 11px 'Allo', 'Zen Kaku Gothic New', sans-serif;
   letter-spacing: 0.08em;
-  cursor: pointer;
+  cursor: var(--cursor-hand);
   transition:
     background-color 0.2s ease,
     color 0.2s ease;
@@ -80,9 +80,11 @@
     display 0.15s allow-discrete,
     overlay 0.15s allow-discrete;
 
+  // 閉じるときは open が先に外れてから消えていくので、配置は open に関係なく決めておく。
+  place-items: center;
+
   &[open] {
     display: grid;
-    place-items: center;
     opacity: 1;
     transition-duration: 0.3s;
   }
@@ -138,7 +140,7 @@
   color: var(--fg);
   font-size: 22px;
   line-height: 1;
-  cursor: pointer;
+  cursor: var(--cursor-hand);
   transition: background-color 0.2s ease;
 
   &:focus-visible {
