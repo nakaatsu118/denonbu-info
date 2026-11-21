@@ -4,10 +4,10 @@
   z-index: 1;
   display: flex;
   align-items: flex-start;
-  gap: 40px;
-  max-width: 1200px;
+  gap: 48px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 104px 24px 64px;
+  padding: 112px 32px 80px;
 }
 
 // スクリプトが動かないと絞り込めないので、動くときだけ出す（下の :global(.js)）。
@@ -21,26 +21,25 @@
   top: 16px;
   flex: none;
   flex-direction: column;
-  gap: 4px;
-  width: 220px;
+  width: 248px;
   max-height: calc(100dvh - 32px);
-  padding: 6px;
+  padding: 8px;
   overflow-y: auto;
-  border-radius: 24px;
+  border-radius: 28px;
   background: rgb(22 22 24 / 0.72);
   box-shadow: inset 0 0 0 1px var(--line);
 
   input[type='search'] {
     flex: none;
     width: 100%;
-    height: 36px;
-    padding: 0 14px;
+    height: 40px;
+    padding: 0 16px;
     border: 0;
     border-radius: 999px;
     background: rgb(255 255 255 / 0.08);
     color: var(--fg);
     font: inherit;
-    font-size: 13px;
+    font-size: 14px;
     appearance: none;
     -webkit-appearance: none;
 
@@ -55,18 +54,39 @@
   }
 
   h2 {
-    margin: 14px 0 4px;
-    padding: 0 14px;
+    margin: 18px 0 4px;
+    padding: 0 16px;
     color: var(--muted);
-    font: 500 11px 'Montserrat', 'Zen Kaku Gothic New', sans-serif;
-    letter-spacing: 0.14em;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
   }
 }
 
 .opts {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+}
+
+// マウスを載せた行へ滑っていくハイライト。位置と大きさはスクリプトが決める。
+.hover {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.1);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.15s ease,
+    transform 0.2s var(--ease-out),
+    width 0.2s var(--ease-out),
+    height 0.2s var(--ease-out);
+
+  &[data-on] {
+    opacity: 1;
+  }
 }
 
 // ラジオボタンを、ピル型の行として見せる。
@@ -75,13 +95,18 @@
   flex: none;
   display: flex;
   align-items: center;
-  gap: 8px;
-  height: 36px;
-  padding: 0 14px;
+  gap: 10px;
+  height: 40px;
+  margin-top: 4px;
+  padding: 0 16px;
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 14px;
   white-space: nowrap;
   cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.12s var(--ease-out);
 
   input {
     position: absolute;
@@ -92,8 +117,8 @@
   // キャラクターの色。黒に近い色が背景に沈まないように薄い縁を付ける。
   i {
     flex: none;
-    width: 8px;
-    height: 8px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
     background: var(--muted);
     box-shadow: 0 0 0 1px rgb(255 255 255 / 0.2);
@@ -102,8 +127,14 @@
   span {
     margin-left: auto;
     color: var(--muted);
-    font: 500 11px 'Montserrat', sans-serif;
-    letter-spacing: 0.1em;
+    font-size: 12px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    transition: color 0.15s ease;
+  }
+
+  &:active {
+    transform: scale(0.97);
   }
 
   &:has(:checked) {
@@ -119,34 +150,68 @@
     outline: 2px solid var(--fg);
     outline-offset: 2px;
   }
-
-  @media (hover: hover) and (pointer: fine) {
-    &:not(:has(:checked)):hover {
-      background: rgb(255 255 255 / 0.08);
-    }
-  }
 }
 
-// キャラクターは、選んだエリアの下にだけ出す。
+// キャラクターは、選んだエリアの下に開く。高さ0から中身の高さまで伸ばす。
 .members {
-  display: none;
-  flex-direction: column;
-  gap: 2px;
-  padding: 0 0 6px 14px;
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden; // 閉じている間は、Tabキーでも中に入らせない
+  transition:
+    grid-template-rows 0.3s var(--ease-out),
+    visibility 0s 0.3s;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    padding-left: 16px;
+    overflow: hidden;
+  }
 
   .opt {
-    height: 32px;
-    font-size: 12px;
+    height: 36px;
+    font-size: 13px;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition:
+      background-color 0.15s ease,
+      color 0.15s ease,
+      opacity 0.2s ease,
+      transform 0.3s var(--ease-out);
+
+    &:last-child {
+      margin-bottom: 6px;
+    }
 
     &:has(:checked) {
-      background: rgb(255 255 255 / 0.16);
+      background: rgb(255 255 255 / 0.18);
       color: var(--fg);
     }
   }
 }
 
 .opt:has(:checked) + .members {
-  display: flex;
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition-delay: 0s;
+
+  .opt {
+    opacity: 1;
+    transform: none;
+
+    // 上から順に、少しずつ遅らせて現す。
+    @for $i from 1 through 4 {
+      &:nth-child(#{$i}) {
+        transition-delay: 0s, 0s, #{$i * 40}ms, #{$i * 40}ms;
+      }
+    }
+
+    &:active {
+      transform: scale(0.97);
+      transition-delay: 0s;
+    }
+  }
 }
 
 .body {
@@ -157,59 +222,82 @@
 .tools {
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 20px;
+  margin-bottom: 28px;
 
   output {
     color: var(--muted);
-    font: 500 11px 'Montserrat', 'Zen Kaku Gothic New', sans-serif;
-    letter-spacing: 0.1em;
+    font-size: 13px;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+// 押すたびに新しい順と古い順が入れ替わるボタン。矢印が上下に回る。
+.sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.08);
+  color: var(--fg);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+  transition:
+    background-color 0.15s ease,
+    transform 0.12s var(--ease-out);
+
+  svg {
+    transition: transform 0.3s var(--ease-in-out);
   }
 
-  select {
-    height: 36px;
-    padding: 0 30px 0 14px;
-    border: 0;
-    border-radius: 999px;
-    background: rgb(255 255 255 / 0.08)
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23f4f4f2' stroke-width='1.5'/%3E%3C/svg%3E")
-      no-repeat right 12px center;
-    color: var(--fg);
-    font: inherit;
-    font-size: 13px;
-    appearance: none;
-    -webkit-appearance: none;
-    cursor: pointer;
+  &[data-asc] svg {
+    transform: rotate(180deg);
+  }
 
-    &:focus-visible {
-      outline: 2px solid var(--fg);
-      outline-offset: 1px;
+  &:active {
+    transform: scale(0.97);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--fg);
+    outline-offset: 2px;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background: rgb(255 255 255 / 0.16);
     }
   }
 }
 
 .year {
-  margin-bottom: 48px;
+  margin-bottom: 72px;
 
   > h2 {
     display: flex;
     align-items: baseline;
-    gap: 14px;
-    margin: 0 0 14px;
-    font: 600 clamp(32px, 5vw, 48px) / 1 'Montserrat', sans-serif;
-    letter-spacing: 0.06em;
+    gap: 16px;
+    margin: 0 0 24px;
+    font-size: clamp(40px, 5vw, 60px);
+    font-weight: 600;
+    line-height: 1;
 
     span {
       color: var(--muted);
-      font: 500 11px 'Montserrat', 'Zen Kaku Gothic New', sans-serif;
-      letter-spacing: 0.1em;
+      font-size: 13px;
+      font-weight: 500;
     }
   }
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 24px 12px;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 40px 20px;
 }
 
 .tile {
@@ -223,7 +311,7 @@
   aspect-ratio: 1;
   padding: 0;
   border: 0;
-  border-radius: 6px;
+  border-radius: 8px;
   overflow: hidden;
   background: #161618;
   color: inherit;
@@ -235,7 +323,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.2s var(--ease-out);
+    transition: transform 0.3s var(--ease-out);
   }
 
   &:focus-visible {
@@ -248,24 +336,18 @@
       transform: scale(1.04);
     }
   }
-
-  @media (prefers-reduced-motion: reduce) {
-    img {
-      transition: none;
-    }
-  }
 }
 
 .meta {
-  padding-top: 8px;
+  padding-top: 14px;
 
   h3 {
     display: -webkit-box;
-    margin: 2px 0 0;
+    margin: 6px 0 0;
     overflow: hidden;
-    font-size: 0.85rem;
+    font-size: 16px;
     font-weight: 500;
-    line-height: 1.5;
+    line-height: 1.45;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
     line-clamp: 2;
@@ -275,16 +357,16 @@
 .who {
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin: 6px 0 0;
+  gap: 5px;
+  margin: 10px 0 0;
   color: var(--muted);
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.5;
 
   i {
     flex: none;
-    width: 8px;
-    height: 8px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
     background: var(--muted);
     box-shadow: 0 0 0 1px rgb(255 255 255 / 0.2);
@@ -292,7 +374,7 @@
 
   span {
     min-width: 0;
-    margin-left: 2px;
+    margin-left: 3px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -302,7 +384,7 @@
 .empty {
   margin: 80px 0;
   color: var(--muted);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
   text-align: center;
 }
 
@@ -323,11 +405,22 @@
   display: none;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .hover,
+  .opt,
+  .members,
+  .members .opt,
+  .sort svg,
+  .face img {
+    transition: none;
+  }
+}
+
 @media (max-width: 720px) {
   .page {
     flex-direction: column;
-    gap: 16px;
-    padding: 88px 16px 48px;
+    gap: 20px;
+    padding: 96px 16px 56px;
   }
 
   // 左の欄は入らないので、検索の下にエリアを横に並べて送れるようにする。
@@ -342,6 +435,7 @@
     box-shadow: none;
 
     input[type='search'] {
+      height: 44px;
       font-size: 16px; // 16px未満だとiOSが入力時に画面を拡大する
     }
 
@@ -352,31 +446,55 @@
 
   .opts {
     flex-direction: row;
-    gap: 6px;
-    margin: 4px -16px 0;
+    gap: 8px;
+    margin: 10px -16px 0;
     padding: 2px 16px;
     overflow-x: auto;
     scrollbar-width: none;
   }
 
+  .hover {
+    display: none;
+  }
+
   .opt,
   .members .opt {
-    height: 36px;
-    font-size: 12px;
+    height: 40px;
+    margin: 0;
+    font-size: 14px;
     box-shadow: inset 0 0 0 1px var(--line);
   }
 
   // 選んだエリアのキャラクターは、そのエリアのすぐ右に続けて並べる。
-  .opt:has(:checked) + .members {
+  .members,
+  .members > div {
+    display: none;
+  }
+
+  .opt:has(:checked) + .members,
+  .opt:has(:checked) + .members > div {
     display: contents;
   }
 
-  .tools select {
-    font-size: 16px;
+  .tools {
+    margin-bottom: 20px;
+  }
+
+  .sort {
+    height: 44px;
+    font-size: 15px;
+  }
+
+  .year {
+    margin-bottom: 56px;
   }
 
   .grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px 8px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 12px;
+  }
+
+  .meta h3 {
+    font-size: 15px;
   }
 }

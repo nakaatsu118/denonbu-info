@@ -1,16 +1,4 @@
 // 曲の情報（日付、曲名、キャラクター、リンク）と、それを全面に開く詳細の見た目。
-.new {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  padding: 3px 9px;
-  border-radius: 999px;
-  background: var(--fg);
-  color: #000;
-  font: 600 10px/1.5 'Montserrat', sans-serif;
-  letter-spacing: 0.14em;
-}
-
 .info {
   padding: 8px 2px 16px;
 }
@@ -18,8 +6,9 @@
 .date {
   margin: 0;
   color: var(--muted);
-  font: 500 0.7rem 'Montserrat', sans-serif;
-  letter-spacing: 0.14em;
+  font: 500 0.8rem 'Allo', 'Zen Kaku Gothic New', sans-serif;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
 }
 
 .title {
@@ -76,7 +65,7 @@
 
     &::after {
       content: '↗';
-      font-family: 'Montserrat', sans-serif;
+      font-family: 'Allo', 'Zen Kaku Gothic New', sans-serif;
     }
 
     &:first-child {

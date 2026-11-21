@@ -17,7 +17,7 @@
       content: '';
       position: absolute;
       inset: 0;
-      background: rgb(10 10 11 / 0.72);
+      background: rgb(10 10 11 / 0.58);
     }
   }
 
@@ -25,8 +25,8 @@
   // ponytail: 画面全体を毎フレームぼかし直す。重い端末が出てきたら、壁を縮小して描くか流れを止める。
   .stage {
     position: absolute;
-    inset: -48px; // ぼかしで縁が暗く欠けないように、画面より少し大きく描く
-    filter: blur(32px) saturate(1.4);
+    inset: -28px; // ぼかしで縁が暗く欠けないように、画面より少し大きく描く
+    filter: blur(14px) saturate(1.2);
   }
 
   .tile {

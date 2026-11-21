@@ -42,8 +42,8 @@
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   color: var(--fg);
-  font: 600 11px 'Montserrat', 'Zen Kaku Gothic New', sans-serif;
-  letter-spacing: 0.18em;
+  font: 600 11px 'Allo', 'Zen Kaku Gothic New', sans-serif;
+  letter-spacing: 0.08em;
   cursor: pointer;
   transition:
     background-color 0.2s ease,
@@ -180,8 +180,8 @@
 
   h1 {
     margin: 0;
-    font: 600 clamp(4rem, 16vw, 9rem) / 1 'Montserrat', sans-serif;
-    letter-spacing: 0.06em;
+    font: 600 clamp(4rem, 16vw, 9rem) / 1 'Allo', 'Zen Kaku Gothic New', sans-serif;
+    letter-spacing: 0;
   }
 
   p {

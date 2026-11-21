@@ -39,10 +39,8 @@ const ogImage = `${url}/common/og-image.png`;
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600&family=Zen+Kaku+Gothic+New:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="preload" href="/fonts/AlloVariableFriendly.woff2" as="font" type="font/woff2" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500&display=swap" rel="stylesheet" />
     <script is:inline>
       // スクリプトが動く環境だけ「壁」の見た目に切り替える。描画前に付けて、一覧表示が一瞬見えるのを防ぐ。
       document.documentElement.classList.add('js');

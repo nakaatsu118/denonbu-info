@@ -12,8 +12,7 @@ interface Props {
 }
 const { songs } = Astro.props;
 
-const NEW_COUNT = 4;
-const EAGER_COUNT = 12;
+const EAGER_COUNT = 10;
 const OTHER = 'other'; // エリアに属さないキャラクターをまとめる選択肢の値
 
 const areas = new Map(songs.flatMap((song) => song.area.map((area) => [area.id, area.name] as const)));
@@ -37,7 +36,6 @@ const songCount = (characterId: string) => songs.filter((song) => song.character
 
 // 新しい順に並んだ曲を、年ごとにまとめる。
 const years = [...Map.groupBy(songs, (song) => formatDate(song.release_date).slice(0, 4))];
-const newest = new Set(songs.slice(0, NEW_COUNT));
 const eager = new Set(songs.slice(0, EAGER_COUNT));
 ---
 
@@ -47,7 +45,8 @@ const eager = new Set(songs.slice(0, EAGER_COUNT));
   <div class={styles.side} role="search">
     <input type="search" name="q" placeholder="曲名・キャラクター" aria-label="検索" autocomplete="off" />
     <h2 id="area-title">エリア</h2>
-    <div class={styles.opts} role="radiogroup" aria-labelledby="area-title">
+    <div class={styles.opts} role="radiogroup" aria-labelledby="area-title" data-opts>
+      <span class={styles.hover} data-hover aria-hidden="true"></span>
       <label class={styles.opt}>
         <input type="radio" name="area" value="" checked />
         すべて
@@ -63,14 +62,16 @@ const eager = new Set(songs.slice(0, EAGER_COUNT));
             </label>
             {group.members.length > 0 && (
               <div class={styles.members}>
-                {group.members.map((character) => (
-                  <label class={styles.opt}>
-                    <input type="radio" name="char" value={character.id} />
-                    <i style={{ backgroundColor: character.color }} />
-                    {character.name}
-                    <span>{songCount(character.id)}</span>
-                  </label>
-                ))}
+                <div>
+                  {group.members.map((character) => (
+                    <label class={styles.opt}>
+                      <input type="radio" name="char" value={character.id} />
+                      <i style={{ backgroundColor: character.color }} />
+                      {character.name}
+                      <span>{songCount(character.id)}</span>
+                    </label>
+                  ))}
+                </div>
               </div>
             )}
           </>
@@ -82,16 +83,24 @@ const eager = new Set(songs.slice(0, EAGER_COUNT));
   <main class={styles.body}>
     <div class={styles.tools}>
       <output data-count>{songs.length}曲</output>
-      <select name="sort" aria-label="並び替え">
-        <option value="desc">新しい順</option>
-        <option value="asc">古い順</option>
-      </select>
+      <button class={styles.sort} type="button" data-sort>
+        <span data-sort-label>新しい順</span>
+        <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
+          <path
+            d="M6 1.5v9M2.5 7 6 10.5 9.5 7"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"></path>
+        </svg>
+      </button>
     </div>
     <div data-years>
       {
         years.map(([year, list]) => (
           <section class={styles.year} data-year>
-            <h2>
+            <h2 data-move>
               {year}
               <span data-year-count>{list.length}曲</span>
             </h2>
@@ -100,6 +109,7 @@ const eager = new Set(songs.slice(0, EAGER_COUNT));
                 <article
                   class={styles.tile}
                   data-tile
+                  data-move
                   data-q={searchKey(song)}
                   data-areas={areaKeys(song).join(' ')}
                   data-chars={song.characters.map((c) => c.id).join(' ')}
@@ -107,8 +117,8 @@ const eager = new Set(songs.slice(0, EAGER_COUNT));
                   <button class={styles.face} type="button" data-face aria-label={`${song.title} の詳細を開く`}>
                     <img
                       src={image(song.jacket_image.url, 240)}
-                      srcset={[240, 480].map((w) => `${image(song.jacket_image.url, w)} ${w}w`).join(', ')}
-                      sizes="(max-width: 720px) 30vw, 190px"
+                      srcset={[240, 480, 720].map((w) => `${image(song.jacket_image.url, w)} ${w}w`).join(', ')}
+                      sizes="(max-width: 720px) 46vw, 260px"
                       data-large={image(song.jacket_image.url, 960)}
                       alt={song.title}
                       width="240"
@@ -116,7 +126,6 @@ const eager = new Set(songs.slice(0, EAGER_COUNT));
                       loading={eager.has(song) ? 'eager' : 'lazy'}
                       decoding="async"
                     />
-                    {newest.has(song) && <span class={songStyles.new}>NEW</span>}
                   </button>
                   <div class={styles.meta}>
                     <p class={songStyles.date}>{formatDate(song.release_date).slice(5)}</p>
@@ -148,14 +157,22 @@ const eager = new Set(songs.slice(0, EAGER_COUNT));
   const form = document.querySelector<HTMLFormElement>('[data-filters]')!;
   const years = form.querySelector<HTMLElement>('[data-years]')!;
   const sections = [...years.querySelectorAll<HTMLElement>('[data-year]')];
+  const movers = [...years.querySelectorAll<HTMLElement>('[data-move]')]; // 絞り込みと並び替えで位置が変わるもの
   const count = form.querySelector<HTMLElement>('[data-count]')!;
   const empty = form.querySelector<HTMLElement>('[data-empty]')!;
+  const sort = form.querySelector<HTMLElement>('[data-sort]')!;
+  const opts = form.querySelector<HTMLElement>('[data-opts]')!;
+  const hover = opts.querySelector<HTMLElement>('[data-hover]')!;
   const checkedChars = () => form.querySelectorAll<HTMLInputElement>('[name="char"]:checked');
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  let asc = false;
+  const MOVE = { duration: 450, easing: 'cubic-bezier(0.77, 0, 0.175, 1)' }; // 画面内での移動
+  const ENTER = { duration: 350, easing: 'cubic-bezier(0.23, 1, 0.32, 1)', fill: 'backwards' as const }; // 新しく現れるもの
+  const STAGGER = 25; // 現れる順にずらす間隔（ms）
+
   let lastChar = '';
 
-  const apply = () => {
+  const filter = () => {
     const data = new FormData(form);
     const words = String(data.get('q')).normalize('NFKC').toLowerCase().split(/\s+/).filter(Boolean);
     const area = String(data.get('area') ?? '');
@@ -178,14 +195,40 @@ const eager = new Set(songs.slice(0, EAGER_COUNT));
     }
     count.textContent = `${total}曲`;
     empty.hidden = total > 0;
+  };
 
-    // 並びは最初から新しい順なので、向きが変わったときだけ年と曲をそれぞれ逆順に入れ直す。
-    if ((data.get('sort') === 'asc') !== asc) {
-      asc = !asc;
-      years.append(...[...years.children].reverse());
-      for (const section of sections) {
-        const grid = section.lastElementChild!;
-        grid.append(...[...grid.children].reverse());
+  // 並びは最初から新しい順なので、年と曲をそれぞれ逆順に入れ直すだけで切り替わる。
+  const reverse = () => {
+    years.append(...[...years.children].reverse());
+    for (const section of sections) {
+      const grid = section.lastElementChild!;
+      grid.append(...[...grid.children].reverse());
+    }
+    const asc = sort.toggleAttribute('data-asc');
+    sort.querySelector('[data-sort-label]')!.textContent = asc ? '古い順' : '新しい順';
+  };
+
+  // 表示を変える前後の位置を比べ、画面内に残るものは前の位置から動かし、新しく入るものは下から現す。
+  const transition = (change: () => void) => {
+    if (reduce) return change();
+    const onScreen = (r: DOMRect) => r.width > 0 && r.bottom > 0 && r.top < innerHeight;
+    const before = new Map<HTMLElement, DOMRect>();
+    for (const el of movers) {
+      const r = el.getBoundingClientRect(); // 動いている途中なら、その位置から続ける
+      if (onScreen(r)) before.set(el, r);
+      for (const a of el.getAnimations()) a.cancel();
+    }
+    change();
+    let entered = 0;
+    for (const el of movers) {
+      const r = el.getBoundingClientRect();
+      if (!onScreen(r)) continue;
+      const from = before.get(el);
+      if (!from) {
+        const delay = Math.min(entered++, 16) * STAGGER;
+        el.animate([{ opacity: 0, transform: 'translateY(16px) scale(0.96)' }, { opacity: 1, transform: 'none' }], { ...ENTER, delay });
+      } else if (from.left !== r.left || from.top !== r.top) {
+        el.animate([{ transform: `translate(${from.left - r.left}px, ${from.top - r.top}px)` }, { transform: 'none' }], MOVE);
       }
     }
   };
@@ -193,16 +236,45 @@ const eager = new Set(songs.slice(0, EAGER_COUNT));
   form.addEventListener('input', (e) => {
     // エリアを切り替えたら、前のエリアで選んでいたキャラクターは外す。
     if ((e.target as HTMLInputElement).name === 'area') for (const el of checkedChars()) el.checked = false;
-    apply();
+    transition(filter);
   });
   // 選択中のキャラクターをもう一度押すと、選択を外してエリア全体に戻す。
   form.addEventListener('click', (e) => {
     const el = e.target as HTMLInputElement;
     if (el.name !== 'char' || el.value !== lastChar) return;
     el.checked = false;
-    apply();
+    transition(filter);
   });
   form.addEventListener('submit', (e) => e.preventDefault());
+  sort.addEventListener('click', () => transition(reverse));
 
-  apply(); // 再読み込みでフォームの値が復元されていても、表示を合わせる
+  // --- マウスを載せた行へ、ハイライトを滑らせる
+  const moveHover = (target: Element | null) => {
+    const opt = target?.closest<HTMLElement>('label');
+    if (!opt) return hover.removeAttribute('data-on');
+    const a = opt.getBoundingClientRect();
+    const b = opts.getBoundingClientRect();
+    const place = () => {
+      hover.style.transform = `translate(${a.left - b.left}px, ${a.top - b.top}px)`;
+      hover.style.width = `${a.width}px`;
+      hover.style.height = `${a.height}px`;
+    };
+    if (hover.hasAttribute('data-on')) return place();
+    // 出ていないときは、移動を見せずにその場で現す。
+    hover.style.transition = 'none';
+    place();
+    hover.offsetWidth; // 位置を確定させてから、動きを戻す
+    hover.style.transition = '';
+    hover.setAttribute('data-on', '');
+  };
+  opts.addEventListener('pointerover', (e) => {
+    if (e.pointerType === 'mouse') moveHover(e.target as Element);
+  });
+  opts.addEventListener('pointerleave', () => moveHover(null));
+  // キャラクターの欄が開閉して行がずれたら、いま載っている行に合わせ直す。
+  opts.addEventListener('transitionend', (e) => {
+    if (e.propertyName === 'grid-template-rows' && hover.hasAttribute('data-on')) moveHover(opts.querySelector('label:hover'));
+  });
+
+  filter(); // 再読み込みでフォームの値が復元されていても、表示を合わせる
 </script>

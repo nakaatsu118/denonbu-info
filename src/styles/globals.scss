@@ -1,9 +1,18 @@
+// Allo（SIL Open Font License。public/fonts/Allo-OFL.txt）。丸みを固定した可変フォントで、太さだけ変えられる。
+@font-face {
+  font-family: 'Allo';
+  src: url('/fonts/AlloVariableFriendly.woff2') format('woff2');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
 :root {
   --bg: #0a0a0b;
   --fg: #f4f4f2;
   --muted: #a0a0a6; // すりガラスの上でも読める明るさにする
   --line: rgb(255 255 255 / 0.16);
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   color-scheme: dark;
 }
 
@@ -13,7 +22,7 @@ body {
   min-height: 100%;
   background: var(--bg);
   color: var(--fg);
-  font-family: 'Zen Kaku Gothic New', sans-serif;
+  font-family: 'Allo', 'Zen Kaku Gothic New', sans-serif; // 欧文はAllo、和文はZen Kaku Gothic New
 }
 
 a {

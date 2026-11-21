@@ -27,6 +27,12 @@ const { songs } = Astro.props;
   const tiles = [...wall.querySelectorAll<HTMLElement>('[data-tile]')];
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // 読み込むたびに並びを変える。位置は配列の順で決まるので、配列だけ混ぜる。
+  for (let i = tiles.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [tiles[i], tiles[j]] = [tiles[j], tiles[i]];
+  }
+
   const GAP = 12;
   const DRIFT = 12; // 流れる速さ（px/秒）
   const MAX = 1.2; // 中央からこの角度（rad）より外のタイルは描画しない
