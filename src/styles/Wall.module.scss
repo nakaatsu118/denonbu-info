@@ -6,9 +6,9 @@
 :global(.js) {
   .wall {
     position: fixed;
-    // iOSのSafariでは inset: 0 の固定要素がステータスバーとツールバーの裏まで届かず、
-    // そこだけ黒くなる。上下に大きくはみ出させて、バーの裏まで壁を描く。
-    inset: -160px 0;
+    inset: -160px 0 auto;
+    height: calc(100% + 320px);
+    height: calc(100lvh + 320px);
     z-index: 0;
     display: block;
     overflow: hidden;
@@ -21,39 +21,6 @@
       inset: 0;
       background: rgb(10 10 11 / 0.48);
       animation: frost-veil 1.1s var(--ease-in-out) 0.9s backwards;
-    }
-  }
-
-  // iOSのSafari 26は、固定要素とsticky要素をステータスバーとツールバーの裏に描かない。
-  // iOSでは壁を文書の先頭に置き、スクロールした分だけ下へずらして画面に留める。
-  // .clip はページ全体を覆って、動かした壁がページを下へ伸ばさないよう切り取る。
-  // ページの上端より上（一番上でのステータスバーの裏、引っ張ったときの余白）は、Safariが描かないので黒いまま。
-  @supports (-webkit-touch-callout: none) {
-    :global(body) {
-      position: relative;
-    }
-
-    .clip {
-      position: absolute;
-      inset: 0;
-      z-index: 0;
-      overflow: clip;
-      pointer-events: none;
-    }
-
-    .wall {
-      position: absolute;
-      inset: -160px 0 auto;
-      height: calc(100lvh + 320px);
-    }
-
-    // スクロール連動のアニメーションでずらす。スクリプトでずらすと描画がスクロールに遅れてガタつく。
-    // --scroll-max（スクロールできる量）はスクリプトが入れる。
-    @supports (animation-timeline: scroll()) {
-      .wall {
-        animation: follow-scroll linear both;
-        animation-timeline: scroll(root);
-      }
     }
   }
 
@@ -89,13 +56,6 @@
 
   .stage[data-intro] img {
     animation: burst 0.9s var(--ease-out) var(--delay, 0ms) backwards;
-  }
-}
-
-// スクロールの始めから終わりまでで、スクロールできる量だけ下へずらす。ずらす量が常にスクロール量と同じになる。
-@keyframes follow-scroll {
-  to {
-    transform: translate3d(0, var(--scroll-max, 0px), 0);
   }
 }
 

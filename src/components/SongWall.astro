@@ -10,18 +10,15 @@ const { songs } = Astro.props;
 ---
 
 <!-- 一覧の背景に流す飾り。曲の情報は一覧（SongGrid）にあるので、読み上げと操作の対象から外す。 -->
-<!-- .clip はiOSでだけ働く。壁を文書に置くときに、動かした壁がページを伸ばさないよう切り取る。 -->
-<div class={styles.clip} aria-hidden="true">
-  <div class={styles.wall} data-wall-frame>
-    <div class={styles.stage} data-wall>
-      {
-        songs.map((song) => (
-          <div class={styles.tile} data-tile>
-            <img src={image(song.jacket_image.url, 240)} alt="" width="240" height="240" loading="lazy" decoding="async" />
-          </div>
-        ))
-      }
-    </div>
+<div class={styles.wall} aria-hidden="true">
+  <div class={styles.stage} data-wall>
+    {
+      songs.map((song) => (
+        <div class={styles.tile} data-tile>
+          <img src={image(song.jacket_image.url, 240)} alt="" width="240" height="240" loading="lazy" decoding="async" />
+        </div>
+      ))
+    }
   </div>
 </div>
 
@@ -119,23 +116,4 @@ const { songs } = Astro.props;
 
   new ResizeObserver(measure).observe(wall);
   requestAnimationFrame(tick);
-
-  // iOSのSafariは固定要素をステータスバーとツールバーの裏に描かない。iOSでは壁を文書に置き（CSS側）、
-  // スクロールした分だけ下へずらして、画面に留まって見せる。
-  if (CSS.supports('-webkit-touch-callout', 'none')) {
-    if (CSS.supports('animation-timeline: scroll()')) {
-      // ずらすのはスクロール連動のアニメーション（CSS側）。ここではスクロールできる量だけ渡す。
-      const root = document.documentElement;
-      const setMax = () => root.style.setProperty('--scroll-max', `${root.scrollHeight - innerHeight}px`);
-      addEventListener('resize', setMax);
-      new ResizeObserver(setMax).observe(document.body);
-      setMax();
-    } else {
-      // ponytail: スクロール連動のアニメーションがない古いiOSでは、スクリプトでずらす。描画がスクロールに少し遅れる。
-      const frame = document.querySelector<HTMLElement>('[data-wall-frame]')!;
-      const follow = () => (frame.style.transform = `translate3d(0, ${scrollY}px, 0)`);
-      addEventListener('scroll', follow, { passive: true });
-      follow();
-    }
-  }
 </script>
