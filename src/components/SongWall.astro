@@ -122,11 +122,20 @@ const { songs } = Astro.props;
 
   // iOSのSafariは固定要素をステータスバーとツールバーの裏に描かない。iOSでは壁を文書に置き（CSS側）、
   // スクロールした分だけ下へずらして、画面に留まって見せる。
-  // ponytail: スクロールの描画にスクリプトが少し遅れる。ぼかした壁なので目立たない前提。気になったら見直す。
   if (CSS.supports('-webkit-touch-callout', 'none')) {
-    const frame = document.querySelector<HTMLElement>('[data-wall-frame]')!;
-    const follow = () => (frame.style.transform = `translate3d(0, ${scrollY}px, 0)`);
-    addEventListener('scroll', follow, { passive: true });
-    follow();
+    if (CSS.supports('animation-timeline: scroll()')) {
+      // ずらすのはスクロール連動のアニメーション（CSS側）。ここではスクロールできる量だけ渡す。
+      const root = document.documentElement;
+      const setMax = () => root.style.setProperty('--scroll-max', `${root.scrollHeight - innerHeight}px`);
+      addEventListener('resize', setMax);
+      new ResizeObserver(setMax).observe(document.body);
+      setMax();
+    } else {
+      // ponytail: スクロール連動のアニメーションがない古いiOSでは、スクリプトでずらす。描画がスクロールに少し遅れる。
+      const frame = document.querySelector<HTMLElement>('[data-wall-frame]')!;
+      const follow = () => (frame.style.transform = `translate3d(0, ${scrollY}px, 0)`);
+      addEventListener('scroll', follow, { passive: true });
+      follow();
+    }
   }
 </script>
