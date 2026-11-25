@@ -10,15 +10,17 @@ const { songs } = Astro.props;
 ---
 
 <!-- 一覧の背景に流す飾り。曲の情報は一覧（SongGrid）にあるので、読み上げと操作の対象から外す。 -->
-<div class={styles.wall} aria-hidden="true">
-  <div class={styles.stage} data-wall>
-    {
-      songs.map((song) => (
-        <div class={styles.tile} data-tile>
-          <img src={image(song.jacket_image.url, 240)} alt="" width="240" height="240" loading="lazy" decoding="async" />
-        </div>
-      ))
-    }
+<div class={styles.clip} data-wall-clip aria-hidden="true">
+  <div class={styles.wall}>
+    <div class={styles.stage} data-wall>
+      {
+        songs.map((song) => (
+          <div class={styles.tile} data-tile>
+            <img src={image(song.jacket_image.url, 240)} alt="" width="240" height="240" loading="lazy" decoding="async" />
+          </div>
+        ))
+      }
+    </div>
   </div>
 </div>
 
@@ -116,4 +118,14 @@ const { songs } = Astro.props;
 
   new ResizeObserver(measure).observe(wall);
   requestAnimationFrame(tick);
+
+  if (CSS.supports('(-webkit-touch-callout: none) and (animation-timeline: scroll()) and (animation-range: 0px 1px)')) {
+    const clip = document.querySelector<HTMLElement>('[data-wall-clip]')!;
+    const updateScrollRange = () => {
+      // Match the animation range to its travel distance for one pixel of movement per pixel scrolled.
+      clip.style.setProperty('--wall-scroll-range', `${document.documentElement.scrollHeight}px`);
+    };
+    new ResizeObserver(updateScrollRange).observe(document.body);
+    updateScrollRange();
+  }
 </script>

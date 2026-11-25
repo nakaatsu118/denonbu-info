@@ -24,6 +24,49 @@
     }
   }
 
+  // Safari clips fixed layers at the browser bars, so keep the wall in the document on iOS.
+  @supports (-webkit-touch-callout: none) and (animation-timeline: scroll()) and (animation-range: 0px 1px) {
+    :global(body) {
+      position: relative;
+    }
+
+    .clip {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      overflow: clip;
+      pointer-events: none;
+
+      // At the ends of the document, Safari paints the bars with the page color.
+      &::before,
+      &::after {
+        content: '';
+        position: absolute;
+        z-index: 1;
+      }
+
+      &::before {
+        inset: 0 0 auto;
+        height: max(24px, env(safe-area-inset-top));
+        background: linear-gradient(var(--bg), transparent);
+      }
+
+      &::after {
+        inset: auto 0 0;
+        height: max(24px, env(safe-area-inset-bottom));
+        background: linear-gradient(transparent, var(--bg));
+      }
+    }
+
+    .wall {
+      position: absolute;
+      animation: follow-scroll linear both;
+      // Keep the timeline out of the minified shorthand, which Safari cannot parse.
+      animation-timeline: var(--wall-timeline, scroll(root));
+      animation-range: 0px var(--wall-scroll-range, 100lvh);
+    }
+  }
+
   // 壁そのものをぼかす。backdrop-filter は、立体に置いたタイルをぼかさない環境があった。
   // ponytail: 画面全体を毎フレームぼかし直す。重い端末が出てきたら、壁を縮小して描くか流れを止める。
   .stage {
@@ -62,6 +105,16 @@
 @keyframes frost-in {
   from {
     filter: blur(0) saturate(1);
+  }
+}
+
+@keyframes follow-scroll {
+  from {
+    transform: translateY(0);
+  }
+
+  to {
+    transform: translateY(var(--wall-scroll-range, 100lvh));
   }
 }
 
